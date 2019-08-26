@@ -30,7 +30,7 @@ jobs:
       - run:
           name: Install packages
           command: |
-            bin/ddo poetry install
+            bin/dc exec -T shipchain-common poetry install
       - run:
           name: Package safety check
           command: |
