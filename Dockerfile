@@ -20,6 +20,7 @@ ENV PATH=$VIRTUAL_ENV/bin:/root/.poetry/bin:$PATH
 # Initialize app dir and entrypoint scripts
 RUN mkdir /app
 WORKDIR /app
+ENV XDG_CONFIG_HOME /app/.config
 COPY compose/image /
 RUN chmod +x /*.sh
 ENTRYPOINT ["/entrypoint.sh"]

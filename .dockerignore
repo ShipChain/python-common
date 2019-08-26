@@ -23,6 +23,7 @@ coverage.xml
 .idea
 .circleci
 .env*
+.config
 test-results
 htmlcov
 compose/*.yml

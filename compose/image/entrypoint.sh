@@ -12,6 +12,7 @@ if [[ ! -f $VIRTUAL_ENV/bin/python ]];
 then
     echo "Creating virtualenv"
     su-exec $USER_ID:$GROUP_ID virtualenv $VIRTUAL_ENV
+    su-exec $USER_ID:$GROUP_ID poetry config repositories.testpypi https://test.pypi.org/legacy/
 fi
 
 exec su-exec $USER_ID:$GROUP_ID "$@"
