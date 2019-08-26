@@ -1,0 +1,73 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.8
+        user: root
+    environment:
+      ROLE: circleci
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          keys:
+            - virtualenv-alpine-cache-v2-{{ checksum "poetry.lock" }}
+            - virtualenv-alpine-cache-v2
+      - run:
+          name: Build Docker images
+          command: |
+            docker build --target test   --tag shipchain-common-test .
+            docker build --target deploy --tag shipchain-common --cache-from shipchain-common-test .
+      - run:
+          name: Start compose services
+          command: |
+            bin/dc up -d
+      - run:
+          name: Check for valid poetry.lock
+          command: |
+            bin/dc exec -T shipchain-common /bin/bash -c '! poetry install --dry-run | grep "Warning: The lock file is not up to date"'
+      - run:
+          name: Package safety check
+          command: |
+            bin/dc exec -T shipchain-common safety check
+      - run:
+          name: PEP8 Lint check
+          command: |
+            bin/dc exec -T shipchain-common prospector -o pylint
+      - run:
+          name: Bandit SAST tool
+          command: |
+            bin/dc exec -T shipchain-common bandit -r shipchain-common
+      - run:
+          name: Run unit tests and coverage report
+          command: |
+            bin/dc exec -T shipchain-common pytest --junitxml=test-results/pytest/results-pe.xml --cov=shipchain-common --cov-config=.coveragerc --cov-report= tests/
+      - run:
+          name: Copy artifacts from Docker
+          command: |
+            docker cp $(bin/dc ps -q shipchain-common):/app/test-results test-results
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
+      - run:
+          name: Copy virtualenv cache from Docker
+          command: |
+            docker cp $(bin/dc ps -q shipchain-common):/app/.virtualenv/. .virtualenv
+      - save_cache:
+          key: virtualenv-alpine-cache-v2-{{ checksum "poetry.lock" }}
+          paths:
+            - .virtualenv
+      - run:
+          name: Save docker image
+          command: |
+            mkdir -p docker-cache
+            docker save -o docker-cache/built-image.tar shipchain-common
+      - persist_to_workspace:
+          root: docker-cache
+          paths:
+            - built-image.tar

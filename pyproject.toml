@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "shipchain-common"
+version = "0.1.0"
+description = "A PyPI package containing shared code for ShipChain's Python/Django projects."
+
+license = "Apache-2.0"
+
+authors = [
+    "Adam Hodges <ahodges@shipchain.io>"
+]
+
+readme = 'README.md'  # Markdown files are supported
+
+repository = "https://github.com/ShipChain/python-common"
+homepage = "https://github.com/ShipChain/python-common"
+
+keywords = ['shipchain', 'transmission']
+
+[tool.poetry.dependencies]
+python = "^3.6"  # Compatible python versions must be declared here
+requests = "~2.21"
+
+[tool.poetry.dev-dependencies]
+bandit = "~1.5"
+coverage = "==4.5.1"
+prospector = "==1.1.6.2"
+pytest = "^3.0"
+pytest-cov = "~2.6"
+pytest-mock = "^1.10"
+safety = "^1.8"
