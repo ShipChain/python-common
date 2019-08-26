@@ -36,3 +36,11 @@ RUN apk add --no-cache build-base git su-exec
 ## ========================================================= ##
 FROM build as local
 RUN chmod -R 777 /root/  ## Grant all local users access to poetry
+
+## Image with dev-dependencies ##
+## =========================== ##
+FROM build AS test
+
+COPY . /app/
+RUN \[ -d "$VIRTUAL_ENV" \] || virtualenv "$VIRTUAL_ENV"
+RUN . "$VIRTUAL_ENV/bin/activate" && poetry install
