@@ -39,11 +39,11 @@ jobs:
       - run:
           name: Bandit SAST tool
           command: |
-            bin/dc exec -T shipchain-common bandit -r shipchain-common
+            bin/dc exec -T shipchain-common bandit -r src
       - run:
           name: Run unit tests and coverage report
           command: |
-            bin/dc exec -T shipchain-common pytest --junitxml=test-results/pytest/results-pe.xml --cov=shipchain-common --cov-config=.coveragerc --cov-report= tests/
+            bin/dc exec -T shipchain-common pytest --junitxml=test-results/pytest/results-pe.xml --cov=src --cov-config=.coveragerc --cov-report= tests/
       - run:
           name: Copy artifacts from Docker
           command: |
