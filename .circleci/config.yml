@@ -28,6 +28,10 @@ jobs:
           command: |
             bin/dc exec -T shipchain-common /bin/bash -c '! poetry install --dry-run | grep "Warning: The lock file is not up to date"'
       - run:
+          name: Install packages
+          command: |
+            bin/ddo poetry install
+      - run:
           name: Package safety check
           command: |
             bin/dc exec -T shipchain-common safety check
