@@ -19,15 +19,15 @@ keywords = ['shipchain', 'transmission']
 [tool.poetry.dependencies]
 python = "^3.6"  # Compatible python versions must be declared here
 
-django = ">=2.2.4"
-djangorestframework = ">=3.9.1"
-requests = "~2.21"
+django = "^2.2.4"
+djangorestframework = "^3.9.1"
+requests = "^2.21"
 
 [tool.poetry.dev-dependencies]
-bandit = "~1.5"
-coverage = "==4.5.1"
-prospector = "==1.1.6.2"
+bandit = "^1.5"
+coverage = "~4.5.1"
+prospector = "~1.1.6.2"
 pytest = "^3.0"
-pytest-cov = "~2.6"
+pytest-cov = "^2.6"
 pytest-mock = "^1.10"
 safety = "^1.8"
