@@ -5,7 +5,7 @@ jobs:
       - image: circleci/python:3.6.8
         user: root
     environment:
-      ROLE: circleci
+      ROLE: dev
     working_directory: ~/repo
     steps:
       - checkout
@@ -18,8 +18,7 @@ jobs:
       - run:
           name: Build Docker images
           command: |
-            docker build --target test   --tag shipchain-common-test .
-            docker build --target deploy --tag shipchain-common --cache-from shipchain-common-test .
+            docker build --target local --tag shipchain-common-test .
       - run:
           name: Start compose services
           command: |
@@ -66,7 +65,7 @@ jobs:
           name: Save docker image
           command: |
             mkdir -p docker-cache
-            docker save -o docker-cache/built-image.tar shipchain-common
+            docker save -o docker-cache/built-image.tar shipchain-common-test
       - persist_to_workspace:
           root: docker-cache
           paths:
