@@ -21,6 +21,7 @@ python = "^3.6"  # Compatible python versions must be declared here
 
 django = "^2.2.4"
 djangorestframework = "^3.9.1"
+djangorestframework-jsonapi = "~2.5"
 requests = "^2.21"
 
 [tool.poetry.dev-dependencies]
