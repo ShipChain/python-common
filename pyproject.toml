@@ -20,8 +20,11 @@ keywords = ['shipchain', 'transmission']
 python = "^3.6"  # Compatible python versions must be declared here
 
 django = "^2.2.4"
+django-enumfields = "==0.10.0"
 djangorestframework = "^3.9.1"
 djangorestframework-jsonapi = "~2.5"
+djangorestframework-simplejwt = {git = "git://github.com/ShipChain/django-rest-framework-simplejwt.git", rev = "f47065b7e0cf3adf8e4095796cfc13f651a117c6"}
+python-dateutil = "~2.7.5"
 requests = "^2.21"
 
 [tool.poetry.dev-dependencies]
