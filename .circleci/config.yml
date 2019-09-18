@@ -42,7 +42,7 @@ jobs:
       - run:
           name: Bandit SAST tool
           command: |
-            bin/dc exec -T shipchain-common bandit -r src
+            bin/dc exec -T shipchain-common bandit -r src -s B311
       - run:
           name: Run unit tests and coverage report
           command: |

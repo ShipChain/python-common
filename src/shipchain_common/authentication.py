@@ -54,3 +54,7 @@ class InternalRequest(BasePermission):
             certificate_cn = parse_dn(request.META['X_SSL_CLIENT_DN'])['CN']
             return certificate_cn == f'{self.SERVICE_NAME}.{settings.ENVIRONMENT.lower()}-internal'
         return False
+
+
+class EngineRequest(InternalRequest):
+    SERVICE_NAME = 'engine'
