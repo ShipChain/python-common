@@ -124,6 +124,24 @@ def random_id():
     return str(uuid4())
 
 
+def remove_dict_key_recursively(dict_obj, list_key_to_remove):
+    """
+    :param dict_obj: Dictionary object from which we want to remove a particular key
+    :param list_key_to_remove: A list of key to remove recursively
+    :return: The input dict_obj without the key_to_remove key if found
+    """
+    keys_to_remove = [key.lower() for key in list_key_to_remove]
+    to_return = {}
+    for key, value in dict_obj.items():
+        if key.lower() not in keys_to_remove:
+            if isinstance(value, dict):
+                to_return[key] = remove_dict_key_recursively(value, keys_to_remove)
+            else:
+                to_return[key] = value
+
+    return to_return
+
+
 def send_templated_email(template, subject, context, recipients, sender=None):
     request = context.get('request', None)
     send_by = sender if sender else settings.DEFAULT_FROM_EMAIL

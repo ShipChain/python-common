@@ -22,24 +22,12 @@ import requests
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth
 from django.conf import settings
 from rest_framework import status
-from rest_framework.exceptions import APIException
 from influxdb_metrics.loader import log_metric, TimingMetric
+
+from .exceptions import AWSIoTError
 
 
 LOG = logging.getLogger('python_common')
-
-
-class AWSIoTError(APIException):
-    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    default_detail = 'Internal Service Error.'
-    default_code = 'server_error'
-
-    def __init__(self, detail, status_code=None, code=None):
-        super(AWSIoTError, self).__init__(detail, code)
-        self.detail = detail
-
-        if status_code:
-            self.status_code = status_code
 
 
 class AWSIoTClient:

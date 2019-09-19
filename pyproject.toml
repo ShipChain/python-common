@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shipchain-common"
-version = "0.1.1"
+version = "0.1.2"
 description = "A PyPI package containing shared code for ShipChain's Python/Django projects."
 
 license = "Apache-2.0"
