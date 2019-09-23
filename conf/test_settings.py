@@ -9,6 +9,9 @@ INSTALLED_APPS = [
 ]
 
 
+INFLUXDB_DISABLED = True
+
+
 SECRET_KEY = 'abcdef123456'
 
 
