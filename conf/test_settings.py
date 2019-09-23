@@ -1,3 +1,5 @@
+import requests
+
 
 DEBUG = True
 
@@ -10,6 +12,9 @@ INSTALLED_APPS = [
 
 
 INFLUXDB_DISABLED = True
+
+
+REQUESTS_SESSION = requests.session()
 
 
 SECRET_KEY = 'abcdef123456'
