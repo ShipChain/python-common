@@ -21,6 +21,7 @@ python = "^3.6"  # Compatible python versions must be declared here
 
 aws-requests-auth = "~0.4"
 boto3 = "~1.9"
+cryptography = "~2.5"
 django = "^2.2.4"
 django-enumfields = "==0.10.0"
 djangorestframework = "^3.9.1"

@@ -30,7 +30,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 FROM base AS build
 
 # Essential packages for building python packages
-RUN apk add --no-cache build-base git su-exec
+RUN apk add --no-cache build-base git libffi-dev openssl-dev su-exec
 
 ## Image with additional dependencies for local docker usage ##
 ## ========================================================= ##
