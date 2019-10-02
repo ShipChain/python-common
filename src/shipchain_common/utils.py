@@ -25,7 +25,6 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from enumfields.drf import EnumField
 from rest_framework.exceptions import ValidationError
-from rest_framework_json_api.pagination import PageNumberPagination
 
 
 DN_REGEX = re.compile(r'(?:/?)(.+?)(?:=)([^/]+)')
@@ -84,6 +83,18 @@ def get_client_ip(request):
     else:
         addr = request.META.get('REMOTE_ADDR')
     return addr
+
+
+def get_custom_pagination_class():
+    from rest_framework_json_api.pagination import PageNumberPagination
+
+    class CustomResponsePagination(PageNumberPagination):
+        def get_paginated_response(self, data):
+            response = super(CustomResponsePagination, self).get_paginated_response(data)
+            response.data['data'] = response.data.pop('results')
+            return response
+
+    return CustomResponsePagination
 
 
 def get_domain_from_email(email):
@@ -169,14 +180,6 @@ class AliasField(models.Field):
 
     def __get__(self, instance, instance_type=None):
         return getattr(instance, self.db_column)
-
-
-class CustomResponsePagination(PageNumberPagination):
-
-    def get_paginated_response(self, data):
-        response = super(CustomResponsePagination, self).get_paginated_response(data)
-        response.data['data'] = response.data.pop('results')
-        return response
 
 
 class DecimalEncoder(json.JSONEncoder):
