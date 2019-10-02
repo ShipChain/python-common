@@ -27,7 +27,7 @@ from influxdb_metrics.loader import log_metric, TimingMetric
 from .exceptions import AWSIoTError
 
 
-LOG = logging.getLogger('python_common')
+LOG = logging.getLogger('python-common')
 
 
 class AWSIoTClient:
