@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shipchain-common"
-version = "0.1.3"
+version = "0.1.0"
 description = "A PyPI package containing shared code for ShipChain's Python/Django projects."
 
 license = "Apache-2.0"
@@ -24,7 +24,7 @@ aws-requests-auth = "~0.4"
 boto3 = "~1.9"
 cryptography = "~2.5"
 django = "^2.2.4"
-django-enumfields = "==0.10.0"
+django-enumfields = "~0.10.0"
 djangorestframework = "^3.9.1"
 djangorestframework-jsonapi = "~2.5"
 python-dateutil = "~2.7.5"
