@@ -2,6 +2,7 @@ import pytest
 import uuid
 from unittest.mock import patch
 from unittest.case import TestCase
+from datetime import timedelta
 
 from django.conf import settings
 from django.utils import timezone
@@ -54,12 +55,16 @@ def test_snake_to_sentence():
 
 
 def test_datetimeAlmostEqual(mock_now):
-    date_time_1 = mock_now.replace(second=0, microsecond=0)
-    date_time_2 = mock_now.replace(second=0, microsecond=settings.MICROSECONDS_THRESHOLD - 1)
-    date_time_3 = mock_now.replace(second=0, microsecond=settings.MICROSECONDS_THRESHOLD + 1)
+    date_time_1 = mock_now + timedelta(milliseconds=settings.MILLISECONDS_THRESHOLD - 1)
+    date_time_2 = mock_now + timedelta(milliseconds=settings.MILLISECONDS_THRESHOLD + 1)
+    date_time_3 = mock_now - timedelta(milliseconds=settings.MILLISECONDS_THRESHOLD - 1)
+    date_time_4 = mock_now - timedelta(milliseconds=settings.MILLISECONDS_THRESHOLD + 1)
 
-    assert datetimeAlmostEqual(date_time_1, dt2=date_time_2)
-    assert not datetimeAlmostEqual(date_time_1, dt2=date_time_3)
+    assert datetimeAlmostEqual(mock_now, dt2=date_time_1)
+    assert not datetimeAlmostEqual(mock_now, dt2=date_time_2)
+
+    assert datetimeAlmostEqual(mock_now, dt2=date_time_3)
+    assert not datetimeAlmostEqual(mock_now, dt2=date_time_4)
 
 
 class UtilsTests(TestCase):
