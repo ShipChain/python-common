@@ -28,9 +28,6 @@ from requests.models import Response
 from rest_framework_simplejwt.utils import aware_utcnow, datetime_to_epoch
 
 
-MICROSECONDS_THRESHOLD = 5000
-
-
 def create_form_content(data):
     boundary_string = 'BoUnDaRyStRiNg'
 
@@ -40,7 +37,7 @@ def create_form_content(data):
     return content, content_type
 
 
-def datetimeAlmostEqual(dt1, dt2=None, ms_threshold=MICROSECONDS_THRESHOLD):
+def datetimeAlmostEqual(dt1, dt2=None, ms_threshold=settings.MICROSECONDS_THRESHOLD):
     if not dt2:
         dt2 = datetime.now().replace(tzinfo=pytz.UTC)
 

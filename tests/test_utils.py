@@ -3,10 +3,11 @@ import uuid
 from unittest.mock import patch
 from unittest.case import TestCase
 
+from django.conf import settings
 from django.utils import timezone
 
 from src.shipchain_common.utils import assertDeepAlmostEqual, random_id, tznow, snake_to_sentence
-from src.shipchain_common.test_utils import datetimeAlmostEqual, MICROSECONDS_THRESHOLD
+from src.shipchain_common.test_utils import datetimeAlmostEqual
 
 TEST_UUIDS = ['uuid_{}'.format(i) for i in range(10000)]
 
@@ -54,8 +55,8 @@ def test_snake_to_sentence():
 
 def test_datetimeAlmostEqual(mock_now):
     date_time_1 = mock_now.replace(second=0, microsecond=0)
-    date_time_2 = mock_now.replace(second=0, microsecond=MICROSECONDS_THRESHOLD - 1)
-    date_time_3 = mock_now.replace(second=0, microsecond=MICROSECONDS_THRESHOLD + 1)
+    date_time_2 = mock_now.replace(second=0, microsecond=settings.MICROSECONDS_THRESHOLD - 1)
+    date_time_3 = mock_now.replace(second=0, microsecond=settings.MICROSECONDS_THRESHOLD + 1)
 
     assert datetimeAlmostEqual(date_time_1, dt2=date_time_2)
     assert not datetimeAlmostEqual(date_time_1, dt2=date_time_3)
