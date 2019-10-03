@@ -25,6 +25,7 @@ boto3 = "~1.9"
 cryptography = "~2.5"
 django = "^2.2.4"
 django-enumfields = "~0.10.0"
+django-influxdb-metrics = '==1.3.3'
 djangorestframework = "^3.9.1"
 djangorestframework-jsonapi = "~2.5"
 python-dateutil = "~2.7.5"
@@ -33,7 +34,6 @@ requests = "^2.21"
 [tool.poetry.dev-dependencies]
 bandit = "^1.5"
 coverage = "~4.5.1"
-django-influxdb-metrics = {git = "git://github.com/lwbco/django-influxdb-tagged-metrics.git", rev = "add895558ed6ab59c621b19beae026f8933d4848", develop = true}
 djangorestframework-simplejwt = {git = "git://github.com/ShipChain/django-rest-framework-simplejwt.git", rev = "f47065b7e0cf3adf8e4095796cfc13f651a117c6", develop = true}
 prospector = "~1.1.6.2"
 pytest = "^3.0"
