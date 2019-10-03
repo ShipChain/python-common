@@ -17,7 +17,7 @@ bin/dc exec -T shipchain-common safety check
 
 bin/dc exec -T shipchain-common prospector -o pylint
 
-bin/dc exec -T shipchain-common bandit -r src -x src/shipchain_common/test_utils.py
+bin/dc exec -T shipchain-common bandit -r --ini /app/.bandit
 
 bin/dc exec -T shipchain-common pytest -p no:cacheprovider --cov=src --cov-config=.coveragerc --cov-report= tests/
 
