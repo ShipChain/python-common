@@ -28,6 +28,9 @@ from requests.models import Response
 from rest_framework_simplejwt.utils import aware_utcnow, datetime_to_epoch
 
 
+MICROSECONDS_THRESHOLD = 5000
+
+
 def create_form_content(data):
     boundary_string = 'BoUnDaRyStRiNg'
 
@@ -37,10 +40,11 @@ def create_form_content(data):
     return content, content_type
 
 
-def datetimeAlmostEqual(dt1, dt2=None):
+def datetimeAlmostEqual(dt1, dt2=None, ms_threshold=MICROSECONDS_THRESHOLD):
     if not dt2:
         dt2 = datetime.now().replace(tzinfo=pytz.UTC)
-    return dt1.replace(second=0, microsecond=0) == dt2.replace(second=0, microsecond=0)
+
+    return dt1 - timedelta(microseconds=ms_threshold) <= dt2 <= dt1 + timedelta(microseconds=ms_threshold)
 
 
 def get_jwt(exp=None, sub='00000000-0000-0000-0000-000000000000', username='fake@shipchain.io',
