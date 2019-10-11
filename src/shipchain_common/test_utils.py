@@ -37,7 +37,9 @@ def create_form_content(data):
     return content, content_type
 
 
-def datetimeAlmostEqual(dt1, dt2=None, ms_threshold=settings.MILLISECONDS_THRESHOLD):
+def datetimeAlmostEqual(dt1, dt2=None, ms_threshold=None):
+    ms_threshold = settings.MILLISECONDS_THRESHOLD if ms_threshold is None else ms_threshold
+
     if not dt2:
         dt2 = datetime.now().replace(tzinfo=pytz.UTC)
 
