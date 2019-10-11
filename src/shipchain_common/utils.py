@@ -86,6 +86,11 @@ def get_client_ip(request):
 
 
 def get_custom_pagination_class():
+    """
+    We wrap this class into a function to avoid an import error triggered when
+    this module is imported following django.setup() call. Mainly due to the User model trying
+    to be accessed at runtime while the apps are still in loading phase.
+    """
     from rest_framework_json_api.pagination import PageNumberPagination
 
     class CustomResponsePagination(PageNumberPagination):
