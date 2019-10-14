@@ -14,22 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import logging
-
-from .middleware import CURRENT_THREAD
+from rest_framework_json_api.pagination import PageNumberPagination
 
 
-class OrganizationIdFilter(logging.Filter):
-
-    def filter(self, record):
-        record.organization_id = getattr(CURRENT_THREAD, 'organization_id', None)
-
-        return True
-
-
-class UserIdFilter(logging.Filter):
-
-    def filter(self, record):
-        record.user_id = getattr(CURRENT_THREAD, 'user_id', None)
-
-        return True
+class CustomResponsePagination(PageNumberPagination):
+    def get_paginated_response(self, data):
+        response = super(CustomResponsePagination, self).get_paginated_response(data)
+        response.data['data'] = response.data.pop('results')
+        return response

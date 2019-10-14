@@ -85,23 +85,6 @@ def get_client_ip(request):
     return addr
 
 
-def get_custom_pagination_class():
-    """
-    We wrap this class into a function to avoid an import error triggered when
-    this module is imported following django.setup() call. Mainly due to the User model trying
-    to be accessed at runtime while the apps are still in loading phase.
-    """
-    from rest_framework_json_api.pagination import PageNumberPagination
-
-    class CustomResponsePagination(PageNumberPagination):
-        def get_paginated_response(self, data):
-            response = super(CustomResponsePagination, self).get_paginated_response(data)
-            response.data['data'] = response.data.pop('results')
-            return response
-
-    return CustomResponsePagination
-
-
 def get_domain_from_email(email):
     if '@' in email:
         domain = email.split("@")[1]
