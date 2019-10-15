@@ -10,3 +10,4 @@ services:
       - ../:/app
     environment:
       - PYTHONDONTWRITEBYTECODE=1
+      - DJANGO_SETTINGS_MODULE=conf.test_settings

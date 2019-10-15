@@ -8,7 +8,7 @@ ENV LANG C.UTF-8
 ENV PYTHONUNBUFFERED 1
 
 # Essential packages for our app environment
-RUN apk add --no-cache bash curl binutils && \
+RUN apk add --no-cache bash curl binutils linux-headers && \
     curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python && \
     apk del curl
 
@@ -30,7 +30,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 FROM base AS build
 
 # Essential packages for building python packages
-RUN apk add --no-cache build-base git su-exec
+RUN apk add --no-cache build-base git libffi-dev openssl-dev su-exec
 
 ## Image with additional dependencies for local docker usage ##
 ## ========================================================= ##
