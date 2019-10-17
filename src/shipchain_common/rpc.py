@@ -46,7 +46,9 @@ class RPCClient:
         try:
             with TimingMetric('engine_rpc.call', tags={'method': method}) as timer:
                 response_json = settings.REQUESTS_SESSION.post(self.url,
-                                                               data=json.dumps(self.payload, cls=DecimalEncoder)).json()
+                                                               data=json.dumps(self.payload, cls=DecimalEncoder),
+                                                               timeout=getattr(settings, 'REQUESTS_TIMEOUT', 270)
+                                                               ).json()
                 LOG.info('rpc_client(%s) duration: %.3f', method, timer.elapsed)
 
             if 'error' in response_json:
