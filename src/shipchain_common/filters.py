@@ -1,5 +1,6 @@
 from rest_framework_json_api.serializers import ValidationError
 
+
 def filter_enum(queryset, field, value):
     enum = getattr(queryset.model, field).field.enum
     try:
