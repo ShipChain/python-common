@@ -12,6 +12,13 @@ ENVIRONMENT = 'TEST'
 
 DEBUG = True
 
+DATABASES={
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'test_enumobject',
+        'TEST_NAME': 'test_enumobject'
+    }
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,6 +27,8 @@ INSTALLED_APPS = [
     'influxdb_metrics',
     'rest_framework',
     'rest_framework_json_api',
+
+    'tests'
 ]
 
 
