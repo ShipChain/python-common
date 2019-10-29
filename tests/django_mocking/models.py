@@ -15,6 +15,3 @@ class GenericEnum(Enum):
 
 class EnumObject(Model):
     enum_field = EnumIntegerField(enum=GenericEnum, default=GenericEnum.FIRST)
-
-    class Meta:
-        app_label = 'tests'

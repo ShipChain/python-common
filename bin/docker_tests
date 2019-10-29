@@ -19,6 +19,6 @@ bin/dc exec -T shipchain-common prospector -o pylint
 
 bin/dc exec -T shipchain-common bandit -r --ini /app/.bandit
 
-bin/dc exec -T shipchain-common pytest -p no:cacheprovider --cov=src --cov-config=.coveragerc --cov-report= tests/
+bin/dc exec -T shipchain-common python -m pytest -p no:cacheprovider --cov=src --cov-config=.coveragerc --cov-report= tests/ --nomigrations
 
 bin/dc down
