@@ -13,17 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from rest_framework.routers import SimpleRouter
-from rest_framework_nested.routers import NestedSimpleRouter
+from rest_framework.exceptions import ValidationError
 
 
-class OptionalSlashRouter(SimpleRouter):
-    def __init__(self):
-        super(OptionalSlashRouter, self).__init__()
-        self.trailing_slash = '/?'
+def filter_enum(queryset, field, value):
+    enum = getattr(queryset.model, field).field.enum
+    try:
+        enum_value = enum[value.upper()]
+    except KeyError:
+        raise ValidationError('Invalid device type supplied.')
 
-
-class OptionalSlashNested(NestedSimpleRouter):
-    def __init__(self, parent_router, parent_prefix, *args, **kwargs):
-        super(OptionalSlashNested, self).__init__(parent_router, parent_prefix, *args, **kwargs)
-        self.trailing_slash = '/?'
+    queryset = queryset.filter(**{field: enum_value.value})
+    return queryset

@@ -12,6 +12,14 @@ ENVIRONMENT = 'TEST'
 
 DEBUG = True
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+        'TEST_NAME': ':memory:'
+    },
+}
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,6 +28,8 @@ INSTALLED_APPS = [
     'influxdb_metrics',
     'rest_framework',
     'rest_framework_json_api',
+    'tests.django_mocking',
+    'tests'
 ]
 
 

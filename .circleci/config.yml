@@ -46,7 +46,7 @@ jobs:
       - run:
           name: Run unit tests and coverage report
           command: |
-            bin/dc exec -T shipchain-common pytest --junitxml=test-results/pytest/results.xml --cov=src --cov-config=.coveragerc --cov-report= tests/
+            bin/dc exec -T shipchain-common python -m pytest --junitxml=test-results/pytest/results.xml --cov=src --cov-config=.coveragerc --cov-report= tests/ --nomigrations
       - run:
           name: Copy artifacts from Docker
           command: |
