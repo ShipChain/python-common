@@ -69,3 +69,19 @@ def test_call(rpc_client):
 
         response_json = rpc_client.call('test_method')
         assert response_json['test_object'] == {"id": "d5563423-f040-4e0d-8d87-5e941c748d91"}
+
+    with mock.patch.object(requests.Session, 'post') as mock_request_post:
+        unexpected_error = {
+            "unexpected_error": {
+                "message": "Non standard rpc error response",
+            }
+        }
+        mock_request_post.return_value = mocked_rpc_response(unexpected_error, code=406)
+
+        with pytest.raises(RPCError) as rpc_error:
+
+            rpc_client.call('test_method')
+
+        # assert rpc_error.value.status_code == 502
+        assert rpc_error.value.detail == str(unexpected_error)
+

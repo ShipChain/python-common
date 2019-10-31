@@ -45,25 +45,34 @@ class RPCClient:
 
         try:
             with TimingMetric('engine_rpc.call', tags={'method': method}) as timer:
-                response_json = settings.REQUESTS_SESSION.post(self.url,
-                                                               data=json.dumps(self.payload, cls=DecimalEncoder),
-                                                               timeout=getattr(settings, 'REQUESTS_TIMEOUT', 270)
-                                                               ).json()
+                response = settings.REQUESTS_SESSION.post(self.url, data=json.dumps(self.payload, cls=DecimalEncoder),
+                                                          timeout=getattr(settings, 'REQUESTS_TIMEOUT', 270))
+                response_json = response.json()
+
                 LOG.info('rpc_client(%s) duration: %.3f', method, timer.elapsed)
 
-            if 'error' in response_json:
+            if 'error' in response_json and response.status_code == status.HTTP_200_OK:
                 log_metric('engine_rpc.error', tags={'method': method, 'code': response_json['error']['code'],
                                                      'module': __name__})
                 LOG.error('rpc_client(%s) error: %s', method, response_json['error'])
                 raise RPCError(response_json['error']['message'])
+
+            if status.HTTP_400_BAD_REQUEST <= response.status_code:
+                log_metric('engine_rpc.error', tags={'method': method, 'code': response.status_code,
+                                                     'module': __name__})
+                LOG.error('rpc_client(%s) error: %s', method, response_json)
+                raise RPCError(str(response_json), code=response.status_code)
 
             response_json = response_json['result']
 
         except requests.exceptions.ConnectionError:
             # Don't return the true ConnectionError as it can contain internal URLs
             log_metric('engine_rpc.error', tags={'method': method, 'code': 'ConnectionError', 'module': __name__})
-            raise RPCError("Service temporarily unavailable, try again later", status.HTTP_503_SERVICE_UNAVAILABLE,
-                           'service_unavailable')
+            raise RPCError("Service temporarily unavailable, try again later",
+                           status_code=status.HTTP_503_SERVICE_UNAVAILABLE, code='service_unavailable')
+
+        except RPCError as rpc_exc:
+            raise rpc_exc
 
         except Exception as exception:
             log_metric('engine_rpc.error', tags={'method': method, 'code': 'Exception', 'module': __name__})
