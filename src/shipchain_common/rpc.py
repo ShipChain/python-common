@@ -61,7 +61,7 @@ class RPCClient:
                 log_metric('engine_rpc.error', tags={'method': method, 'code': response.status_code,
                                                      'module': __name__})
                 LOG.error('rpc_client(%s) error: %s', method, response_json)
-                raise RPCError(str(response_json), code=response.status_code)
+                raise RPCError(str(response_json), status_code=response.status_code)
 
             response_json = response_json['result']
 

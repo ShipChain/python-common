@@ -212,6 +212,3 @@ class RPCError(APIException):
 
         if status_code:
             self.status_code = status_code
-
-        if code:
-            self.status_code = code
