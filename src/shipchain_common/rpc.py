@@ -47,42 +47,35 @@ class RPCClient:
             with TimingMetric('engine_rpc.call', tags={'method': method}) as timer:
                 response = settings.REQUESTS_SESSION.post(self.url, data=json.dumps(self.payload, cls=DecimalEncoder),
                                                           timeout=getattr(settings, 'REQUESTS_TIMEOUT', 270))
-                response_json = response.json()
 
                 LOG.info('rpc_client(%s) duration: %.3f', method, timer.elapsed)
 
-            if 'error' in response_json and response.status_code == status.HTTP_200_OK:
-                # It's an error properly handled by engine
-                log_metric('engine_rpc.error', tags={'method': method, 'code': response_json['error']['code'],
-                                                     'module': __name__})
-                LOG.error('rpc_client(%s) error: %s', method, response_json['error'])
-                raise RPCError(response_json['error']['message'])
+            if status.is_success(response.status_code):
+                response_json = response.json()
 
-            if status.HTTP_400_BAD_REQUEST <= response.status_code:
+                if 'error' in response_json:
+                    # It's an error properly handled by engine
+                    log_metric('engine_rpc.error', tags={'method': method, 'code': response_json['error']['code'],
+                                                         'module': __name__})
+                    LOG.error('rpc_client(%s) error: %s', method, response_json['error'])
+                    raise RPCError(response_json['error']['message'])
+            else:
                 # It's an unexpected error not handled by engine
                 log_metric('engine_rpc.error', tags={'method': method, 'code': response.status_code,
                                                      'module': __name__})
-                LOG.error('rpc_client(%s) error: %s', method, response_json)
-                raise RPCError(str(response_json), status_code=response.status_code)
-
-            response_json = response_json['result']
+                LOG.error('rpc_client(%s) error: %s', method, response.content)
+                raise RPCError(response.content)
 
         except requests.exceptions.ConnectionError:
             # Don't return the true ConnectionError as it can contain internal URLs
             log_metric('engine_rpc.error', tags={'method': method, 'code': 'ConnectionError', 'module': __name__})
-            raise RPCError("Service temporarily unavailable, try again later",
-                           status_code=status.HTTP_503_SERVICE_UNAVAILABLE, code='service_unavailable')
-
-        except RPCError as rpc_exc:
-            # Since we are in a try ... except loop, the above raised
-            # rpc errors need to be re-raised here in order to be properly catch
-            raise rpc_exc
+            raise RPCError("Service temporarily unavailable, try again later", code='service_unavailable')
 
         except Exception as exception:
             log_metric('engine_rpc.error', tags={'method': method, 'code': 'Exception', 'module': __name__})
             raise RPCError(str(exception))
 
-        return response_json
+        return response_json['result']
 
     def sign_transaction(self, wallet_id, transaction):
         LOG.debug('Signing transaction %s with wallet_id %s.', transaction, wallet_id)
