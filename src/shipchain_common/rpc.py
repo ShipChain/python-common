@@ -52,12 +52,14 @@ class RPCClient:
                 LOG.info('rpc_client(%s) duration: %.3f', method, timer.elapsed)
 
             if 'error' in response_json and response.status_code == status.HTTP_200_OK:
+                # It's an error properly handled by engine
                 log_metric('engine_rpc.error', tags={'method': method, 'code': response_json['error']['code'],
                                                      'module': __name__})
                 LOG.error('rpc_client(%s) error: %s', method, response_json['error'])
                 raise RPCError(response_json['error']['message'])
 
             if status.HTTP_400_BAD_REQUEST <= response.status_code:
+                # It's an unexpected error not handled by engine
                 log_metric('engine_rpc.error', tags={'method': method, 'code': response.status_code,
                                                      'module': __name__})
                 LOG.error('rpc_client(%s) error: %s', method, response_json)
@@ -72,6 +74,8 @@ class RPCClient:
                            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, code='service_unavailable')
 
         except RPCError as rpc_exc:
+            # Since we are in a try ... except loop, the above raised
+            # rpc errors need to be re-raised here in order to be properly catch
             raise rpc_exc
 
         except Exception as exception:
