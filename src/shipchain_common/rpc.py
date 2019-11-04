@@ -69,7 +69,8 @@ class RPCClient:
         except requests.exceptions.ConnectionError:
             # Don't return the true ConnectionError as it can contain internal URLs
             log_metric('engine_rpc.error', tags={'method': method, 'code': 'ConnectionError', 'module': __name__})
-            raise RPCError("Service temporarily unavailable, try again later", code='service_unavailable')
+            raise RPCError("Service temporarily unavailable, try again later",
+                           status_code=status.HTTP_503_SERVICE_UNAVAILABLE, code='service_unavailable')
 
         except Exception as exception:
             log_metric('engine_rpc.error', tags={'method': method, 'code': 'Exception', 'module': __name__})

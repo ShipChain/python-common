@@ -34,11 +34,11 @@ def test_call(rpc_client):
 
     # Call without the backend should return the 503 RPCError
     with mock.patch.object(requests.Session, 'post') as mock_method:
-        mock_method.side_effect = requests.exceptions.ConnectionError('not found')
+        mock_method.side_effect = requests.exceptions.ConnectionError(mock.Mock(status=503), 'not found')
 
         with pytest.raises(RPCError) as rpc_error:
             rpc_client.call('test_method')
-        assert rpc_error.value.status_code == 500
+        assert rpc_error.value.status_code == 503
         assert rpc_error.value.detail == 'Service temporarily unavailable, try again later'
 
     # Error response from RPC Server should return server detail in exception
