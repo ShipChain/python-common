@@ -86,9 +86,10 @@ def generate_vnd_json(attributes, object_type, object_id=None):
     return data
 
 
-def mocked_rpc_response(json, code=200):
+def mocked_rpc_response(json, content=None, code=200):
     response = Mock(spec=Response)
     response.status_code = code
+    response.content = content
     response.json.return_value = json
     return response
 

@@ -38,8 +38,8 @@ def test_call(rpc_client):
 
         with pytest.raises(RPCError) as rpc_error:
             rpc_client.call('test_method')
-            assert rpc_error.status_code == 503
-            assert rpc_error.detail == 'Service temporarily unavailable, try again later'
+        assert rpc_error.value.status_code == 503
+        assert rpc_error.value.detail == 'Service temporarily unavailable, try again later'
 
     # Error response from RPC Server should return server detail in exception
     with mock.patch.object(requests.Session, 'post') as mock_method:
@@ -52,8 +52,9 @@ def test_call(rpc_client):
 
         with pytest.raises(RPCError) as rpc_error:
             rpc_client.call('test_method')
-            assert rpc_error.status_code == 500
-            assert rpc_error.detail == 'Error from RPC Server'
+
+        assert rpc_error.value.status_code == 500
+        assert rpc_error.value.detail == 'Error from RPC Server'
 
         # Response object from server should be returned on success
         mock_method.return_value = mocked_rpc_response({
@@ -69,3 +70,16 @@ def test_call(rpc_client):
 
         response_json = rpc_client.call('test_method')
         assert response_json['test_object'] == {"id": "d5563423-f040-4e0d-8d87-5e941c748d91"}
+
+    with mock.patch.object(requests.Session, 'post') as mock_request_post:
+        unexpected_error = b'Unexpected server error'
+        mock_request_post.return_value = mocked_rpc_response(unexpected_error, content=unexpected_error,
+                                                             code=406)
+
+        with pytest.raises(RPCError) as rpc_error:
+
+            rpc_client.call('test_method')
+
+        assert rpc_error.value.status_code == 500
+        assert str(rpc_error.value) == str(unexpected_error)
+

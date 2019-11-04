@@ -45,31 +45,38 @@ class RPCClient:
 
         try:
             with TimingMetric('engine_rpc.call', tags={'method': method}) as timer:
-                response_json = settings.REQUESTS_SESSION.post(self.url,
-                                                               data=json.dumps(self.payload, cls=DecimalEncoder),
-                                                               timeout=getattr(settings, 'REQUESTS_TIMEOUT', 270)
-                                                               ).json()
+                response = settings.REQUESTS_SESSION.post(self.url, data=json.dumps(self.payload, cls=DecimalEncoder),
+                                                          timeout=getattr(settings, 'REQUESTS_TIMEOUT', 270))
+
                 LOG.info('rpc_client(%s) duration: %.3f', method, timer.elapsed)
 
-            if 'error' in response_json:
-                log_metric('engine_rpc.error', tags={'method': method, 'code': response_json['error']['code'],
-                                                     'module': __name__})
-                LOG.error('rpc_client(%s) error: %s', method, response_json['error'])
-                raise RPCError(response_json['error']['message'])
+            if status.is_success(response.status_code):
+                response_json = response.json()
 
-            response_json = response_json['result']
+                if 'error' in response_json:
+                    # It's an error properly handled by engine
+                    log_metric('engine_rpc.error', tags={'method': method, 'code': response_json['error']['code'],
+                                                         'module': __name__})
+                    LOG.error('rpc_client(%s) error: %s', method, response_json['error'])
+                    raise RPCError(response_json['error']['message'])
+            else:
+                # It's an unexpected error not handled by engine
+                log_metric('engine_rpc.error', tags={'method': method, 'code': response.status_code,
+                                                     'module': __name__})
+                LOG.error('rpc_client(%s) error: %s', method, response.content)
+                raise RPCError(response.content)
 
         except requests.exceptions.ConnectionError:
             # Don't return the true ConnectionError as it can contain internal URLs
             log_metric('engine_rpc.error', tags={'method': method, 'code': 'ConnectionError', 'module': __name__})
-            raise RPCError("Service temporarily unavailable, try again later", status.HTTP_503_SERVICE_UNAVAILABLE,
-                           'service_unavailable')
+            raise RPCError("Service temporarily unavailable, try again later",
+                           status_code=status.HTTP_503_SERVICE_UNAVAILABLE, code='service_unavailable')
 
         except Exception as exception:
             log_metric('engine_rpc.error', tags={'method': method, 'code': 'Exception', 'module': __name__})
             raise RPCError(str(exception))
 
-        return response_json
+        return response_json['result']
 
     def sign_transaction(self, wallet_id, transaction):
         LOG.debug('Signing transaction %s with wallet_id %s.', transaction, wallet_id)
