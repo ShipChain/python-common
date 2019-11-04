@@ -21,7 +21,7 @@ def filter_enum(queryset, field, value):
     try:
         enum_value = enum[value.upper()]
     except KeyError:
-        raise ValidationError('Invalid device type supplied.')
+        raise ValidationError(f'Invalid value for field "{field}" supplied.')
 
     queryset = queryset.filter(**{field: enum_value.value})
     return queryset
