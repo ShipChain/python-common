@@ -18,6 +18,7 @@ import threading
 
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 CURRENT_THREAD = threading.current_thread()
 
@@ -25,25 +26,28 @@ CURRENT_THREAD = threading.current_thread()
 class UserOrganizationMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
-        # We put this import here to avoid import error on start up
-        from ..authentication import PASSIVE_JWT_AUTHENTICATION, passive_credentials_auth
+        # We put this import here to avoid cyclical imports during app init
+        from src.shipchain_common.authentication import PASSIVE_JWT_AUTHENTICATION, passive_credentials_auth
 
         user_id, org_id = None, None
         header = PASSIVE_JWT_AUTHENTICATION.get_header(request)
 
         if header:
             raw_token = PASSIVE_JWT_AUTHENTICATION.get_raw_token(header)
+            try:
+                if settings.ENVIRONMENT.lower() in ('int', 'local'):
+                    from rest_framework_simplejwt.tokens import UntypedToken
+                    # We use UntypedToken with verify False here to avoid
+                    # unhandled exception to be thrown to the client
+                    token_user = PASSIVE_JWT_AUTHENTICATION.get_user(UntypedToken(raw_token, verify=False))
+                else:
+                    token_user = passive_credentials_auth(raw_token)
 
-            if settings.ENVIRONMENT.lower() in ('int', 'local'):
-                from rest_framework_simplejwt.tokens import UntypedToken
-                # We use UntypedToken with verify False here to avoid
-                # unhandled exception to be thrown to the client
-                token_user = PASSIVE_JWT_AUTHENTICATION.get_user(UntypedToken(raw_token, verify=False))
-            else:
-                token_user = passive_credentials_auth(raw_token)
-
-            org_id = token_user.token.payload.get('organization_id')
-            user_id = token_user.id
+                org_id = token_user.token.payload.get('organization_id')
+                user_id = token_user.id
+            except InvalidToken:
+                # Provided token is expired or invalid
+                pass
 
         setattr(CURRENT_THREAD, 'organization_id', org_id)
         setattr(CURRENT_THREAD, 'user_id', user_id)
