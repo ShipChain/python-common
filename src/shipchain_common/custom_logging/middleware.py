@@ -27,7 +27,7 @@ class UserOrganizationMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         # We put this import here to avoid cyclical imports during app init
-        from src.shipchain_common.authentication import PASSIVE_JWT_AUTHENTICATION, passive_credentials_auth
+        from ..authentication import PASSIVE_JWT_AUTHENTICATION, passive_credentials_auth
 
         user_id, org_id = None, None
         header = PASSIVE_JWT_AUTHENTICATION.get_header(request)
