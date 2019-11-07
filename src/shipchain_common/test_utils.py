@@ -19,7 +19,7 @@ import re
 import random
 from datetime import datetime, timedelta
 from unittest.mock import Mock
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import jwt
 from django.conf import settings
@@ -48,7 +48,7 @@ def datetimeAlmostEqual(dt1, dt2=None, ms_threshold=None):
 
 def get_jwt(exp=None, sub='00000000-0000-0000-0000-000000000000', username='fake@shipchain.io', **kwargs):
     payload = {'email': username, 'username': username, 'sub': sub,
-               'aud': '892633'}
+               'aud': '892633', 'jti': uuid4().hex}
 
     for prop_name, prop_value in kwargs.items():
         if prop_value is not None:
