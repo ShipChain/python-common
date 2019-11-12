@@ -134,7 +134,7 @@ class PermissionedTokenUser(TokenUser):
         if not permissions:
             features = self.token.get('features')
             if not features:
-                return set()
+                return []
 
             permissions = []
             for feature in features:
