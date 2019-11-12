@@ -46,7 +46,7 @@ def datetimeAlmostEqual(dt1, dt2=None, ms_threshold=None):
     return dt1 - timedelta(milliseconds=ms_threshold) <= dt2 <= dt1 + timedelta(milliseconds=ms_threshold)
 
 
-def get_jwt(exp=None, sub='00000000-0000-0000-0000-000000000000', username='fake@shipchain.io', **kwargs):
+def get_jwt(exp=None, iat=None, sub='00000000-0000-0000-0000-000000000000', username='fake@shipchain.io', **kwargs):
     payload = {'email': username, 'username': username, 'sub': sub,
                'aud': '892633', 'jti': uuid4().hex}
 
@@ -63,7 +63,10 @@ def get_jwt(exp=None, sub='00000000-0000-0000-0000-000000000000', username='fake
     else:
         payload['exp'] = datetime_to_epoch(now + timedelta(minutes=5))
 
-    payload['iat'] = datetime_to_epoch(now)
+    if iat:
+        payload['iat'] = iat
+    else:
+        payload['iat'] = datetime_to_epoch(now)
 
     return jwt.encode(payload=payload, key=settings.SIMPLE_JWT['PRIVATE_KEY'], algorithm='RS256',
                       headers={'kid': '230498151c214b788dd97f22b85410a5'}).decode('utf-8')
