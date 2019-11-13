@@ -49,7 +49,7 @@ class HasViewSetActionPermissions(permissions.BasePermission):
             destroy
             list
         """
-        if bool(request.user and request.user.is_authenticated):
+        if request.user and request.user.is_authenticated:
 
             if view.action_user_permissions is None:
                 return True
