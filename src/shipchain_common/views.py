@@ -18,13 +18,13 @@ limitations under the License.
 class MultiSerializerViewSetMixin:
     def get_serializer_class(self):
         """
-        Look for serializer class in self.serializer_action_classes, which
+        Look for serializer class in self.action_serializer_classes, which
         should be a dict mapping action name (key) to serializer class (value),
         i.e.:
 
         class MyViewSet(MultiSerializerViewSetMixin, ViewSet):
             serializer_class = MyDefaultSerializer
-            serializer_action_classes = {
+            action_serializer_classes = {
                'list': MyListSerializer,
                'my_action': MyActionSerializer,
             }
@@ -48,16 +48,16 @@ class MultiSerializerViewSetMixin:
 
         try:
             # PUT and PATCH should use the same serializers if not separately defined
-            if action == 'partial_update' and 'partial_update' not in self.serializer_action_classes:
+            if action == 'partial_update' and 'partial_update' not in self.action_serializer_classes:
                 action = 'update'
 
             if 'format' in self.kwargs:
                 try:
-                    return self.serializer_action_classes[f'{action}.{self.kwargs["format"]}']
+                    return self.action_serializer_classes[f'{action}.{self.kwargs["format"]}']
                 except (KeyError, AttributeError):
                     pass
 
-            return self.serializer_action_classes[action]
+            return self.action_serializer_classes[action]
 
         except (KeyError, AttributeError):
             return super(MultiSerializerViewSetMixin, self).get_serializer_class()

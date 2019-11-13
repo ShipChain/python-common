@@ -6,7 +6,7 @@ from shipchain_common.permissions import HasViewSetActionPermissions
 def test_view():
     class View:
         action = 'list'
-        action_permissions = {}
+        action_user_permissions = {}
     return View()
 
 
@@ -61,21 +61,21 @@ def test_view_no_required_permission(authed_request, test_view):
 def test_view_permission_not_for_action(authed_request, test_view):
     """Should be True if view lists action permissions but not for this action"""
     test = HasViewSetActionPermissions()
-    test_view.action_permissions = {'create': 'create_permission'}
+    test_view.action_user_permissions = {'create': 'create_permission'}
     assert test.has_permission(authed_request, test_view)
 
 
 def test_view_permission_missing(authed_request, test_view):
     """Should be False if view lists action permission but it isn't on User"""
     test = HasViewSetActionPermissions()
-    test_view.action_permissions = {'list': 'list_permission'}
+    test_view.action_user_permissions = {'list': 'list_permission'}
     assert not test.has_permission(authed_request, test_view)
 
 
 def test_view_permissions_missing(authed_request, test_view):
     """Should be False if view lists multiple action permissions but all aren't on User"""
     test = HasViewSetActionPermissions()
-    test_view.action_permissions = {'list': ['list_permission', 'list_permission2']}
+    test_view.action_user_permissions = {'list': ['list_permission', 'list_permission2']}
     assert not test.has_permission(authed_request, test_view)
 
 
@@ -83,7 +83,7 @@ def test_view_permissions_missing_one(authed_request, test_view):
     """Should be False if view lists multiple action permissions but only one is on User"""
     test = HasViewSetActionPermissions()
     authed_request.user.perms.append('list_permission')
-    test_view.action_permissions = {'list': ['list_permission', 'list_permission2']}
+    test_view.action_user_permissions = {'list': ['list_permission', 'list_permission2']}
     assert not test.has_permission(authed_request, test_view)
 
 
@@ -91,7 +91,7 @@ def test_view_permission_has_it(authed_request, test_view):
     """Should be True if view lists action permission and it's on User"""
     test = HasViewSetActionPermissions()
     authed_request.user.perms.append('list_permission')
-    test_view.action_permissions = {'list': 'list_permission'}
+    test_view.action_user_permissions = {'list': 'list_permission'}
     assert test.has_permission(authed_request, test_view)
 
 
@@ -100,7 +100,7 @@ def test_view_permissions_has_all(authed_request, test_view):
     test = HasViewSetActionPermissions()
     authed_request.user.perms.append('list_permission')
     authed_request.user.perms.append('list_permission2')
-    test_view.action_permissions = {'list': ['list_permission', 'list_permission2']}
+    test_view.action_user_permissions = {'list': ['list_permission', 'list_permission2']}
     assert test.has_permission(authed_request, test_view)
 
 
@@ -109,7 +109,7 @@ def test_partial_update_view_permission(authed_request, test_view):
     test = HasViewSetActionPermissions()
     authed_request.user.perms.append('update_permission')
     test_view.action = 'partial_update'
-    test_view.action_permissions = {'update': 'update_permission'}
+    test_view.action_user_permissions = {'update': 'update_permission'}
     assert test.has_permission(authed_request, test_view)
 
 
@@ -118,7 +118,7 @@ def test_partial_update_view_update_permission(authed_request, test_view):
     test = HasViewSetActionPermissions()
     authed_request.user.perms.append('update_permission')
     test_view.action = 'partial_update'
-    test_view.action_permissions = {'update': 'update_permission', 'partial_update': 'partial_update_permission'}
+    test_view.action_user_permissions = {'update': 'update_permission', 'partial_update': 'partial_update_permission'}
     assert not test.has_permission(authed_request, test_view)
 
 
@@ -127,5 +127,5 @@ def test_partial_update_view_partial_permission(authed_request, test_view):
     test = HasViewSetActionPermissions()
     authed_request.user.perms.append('partial_update_permission')
     test_view.action = 'partial_update'
-    test_view.action_permissions = {'update': 'update_permission', 'partial_update': 'partial_update_permission'}
+    test_view.action_user_permissions = {'update': 'update_permission', 'partial_update': 'partial_update_permission'}
     assert test.has_permission(authed_request, test_view)

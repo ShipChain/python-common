@@ -21,13 +21,13 @@ from rest_framework import permissions
 class HasViewSetActionPermissions(permissions.BasePermission):
     def has_permission(self, request, view):
         """
-        Look for list of required FeaturePermissions in view.action_permissions, which
+        Look for list of required FeaturePermissions in view.action_user_permissions, which
         should be a dict mapping action name (key) to FeaturePermission (value),
         i.e.:
 
         class MyViewSet(HasViewSetActionPermissions, ViewSet):
             permission_classes = (permissions.IsAuthenticated, HasViewSetActionPermissions)
-            action_permissions = {
+            action_user_permissions = {
                 'create': 'my_feature.create_object',
                 'retrieve': 'my_feature.view_object',
                 'my_action': 'my_feature.special_permission',
@@ -51,17 +51,17 @@ class HasViewSetActionPermissions(permissions.BasePermission):
         """
         if bool(request.user and request.user.is_authenticated):
 
-            if view.action_permissions is None:
+            if view.action_user_permissions is None:
                 return True
 
             action = view.action
 
             # PUT and PATCH should use the same permissions if not separately defined
-            if action == 'partial_update' and 'partial_update' not in view.action_permissions:
+            if action == 'partial_update' and 'partial_update' not in view.action_user_permissions:
                 action = 'update'
 
             try:
-                perms = view.action_permissions[action]
+                perms = view.action_user_permissions[action]
                 if isinstance(perms, str):
                     perms = [perms]
             except (KeyError, AttributeError):
