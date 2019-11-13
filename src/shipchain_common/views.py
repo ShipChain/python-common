@@ -61,3 +61,48 @@ class MultiSerializerViewSetMixin:
 
         except (KeyError, AttributeError):
             return super(MultiSerializerViewSetMixin, self).get_serializer_class()
+
+
+class MultiPermissionViewSetMixin:
+    def get_permissions(self):
+        """
+        Look for permission classes in self.action_permission_classes, which
+        should be a dict mapping action name (key) to list of permission classes (value),
+        i.e.:
+
+        class MyViewSet(MultiPermissionViewSetMixin, ViewSet):
+            permission_classes = (HasViewSetActionPermissions,)
+            action_permission_classes = {
+               'list': (permissions.AllowAny,),
+               'my_action': (HasViewSetActionPermissions, isOwner,),
+            }
+
+            @action
+            def my_action:
+                ...
+
+        If there's no entry for that action then just fallback to the regular permission_classes
+
+        Built-in actions:
+            create
+            retrieve
+            update         PUT
+            partial_update PATCH
+            destroy
+            list
+        """
+        permission_classes = self.permission_classes
+
+        try:
+            action = self.action
+
+            # PUT and PATCH should use the same permission classes if not separately defined
+            if action == 'partial_update' and 'partial_update' not in self.action_permission_classes:
+                action = 'update'
+
+            permission_classes = self.action_permission_classes[action]
+
+        except (KeyError, AttributeError):
+            pass
+
+        return [permission() for permission in permission_classes]
