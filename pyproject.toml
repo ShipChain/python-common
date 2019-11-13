@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shipchain-common"
-version = "1.0.6"
+version = "1.0.7"
 description = "A PyPI package containing shared code for ShipChain's Python/Django projects."
 
 license = "Apache-2.0"
@@ -19,7 +19,7 @@ homepage = "https://github.com/ShipChain/python-common"
 keywords = ['shipchain', 'transmission']
 
 [tool.poetry.dependencies]
-python = "^3.6"  # Compatible python versions must be declared here
+python = ">=3.6,<3.8"  # Compatible python versions must be declared here
 
 aws-requests-auth = "~0.4"
 boto3 = "~1.9"
@@ -36,7 +36,7 @@ requests = "^2.21"
 [tool.poetry.dev-dependencies]
 bandit = "^1.5"
 coverage = "~4.5.1"
-djangorestframework-simplejwt = {git = "git://github.com/ShipChain/django-rest-framework-simplejwt.git", rev = "f47065b7e0cf3adf8e4095796cfc13f651a117c6", develop = true}
+djangorestframework-simplejwt = {git = "git://github.com/ShipChain/django-rest-framework-simplejwt.git", rev = "3cecdfc8050b691e51e7d45229d8bd7c03a8d6c2"}
 prospector = "~1.1.6.2"
 pytest = "^3.0"
 pytest-cov = "^2.6"
