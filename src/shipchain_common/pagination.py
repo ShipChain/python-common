@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from rest_framework_json_api.pagination import PageNumberPagination
+from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 
 
-class CustomResponsePagination(PageNumberPagination):
+class CustomResponsePagination(JsonApiPageNumberPagination):
     def get_paginated_response(self, data):
         response = super(CustomResponsePagination, self).get_paginated_response(data)
         response.data['data'] = response.data.pop('results')
