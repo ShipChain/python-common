@@ -17,7 +17,15 @@ limitations under the License.
 from rest_framework_json_api.pagination import JsonApiPageNumberPagination
 
 
-class CustomResponsePagination(JsonApiPageNumberPagination):
+class JsonResponsePagination(JsonApiPageNumberPagination):
+    """
+    Django Rest Framework JsonApi version 3.0.0 introduces JsonApiPageNumberPagination as base pagination class
+    with page query param: 'page[number]' that needs to be overridden here with proper value
+    """
+    page_query_param = 'page'
+
+
+class CustomResponsePagination(JsonResponsePagination):
     def get_paginated_response(self, data):
         response = super(CustomResponsePagination, self).get_paginated_response(data)
         response.data['data'] = response.data.pop('results')
