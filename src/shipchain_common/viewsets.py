@@ -121,7 +121,7 @@ class ActionConfiguration:
             self.response_serializer = self.serializer
             self.serializer = None
 
-        elif self.response_serializer:
+        elif self.request_serializer or self.response_serializer:
             self.re_serialize_response = True
 
         if self.response_serializer:
