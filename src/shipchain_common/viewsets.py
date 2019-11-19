@@ -13,9 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from django.conf import settings
 from rest_framework.viewsets import GenericViewSet
 
 from . import mixins
+
+FORMAT_SUFFIX = settings.FORMAT_SUFFIX_KWARG
 
 
 class ActionConfiguration:
@@ -208,8 +211,8 @@ class ConfigurableGenericViewSet(GenericViewSet):
             return config.request_serializer
 
         if serialization_type == mixins.SerializationType.RESPONSE and config.response_serializer:
-            if 'format' in self.kwargs and self.kwargs['format'] in config.response_serializer:
-                return config.response_serializer[self.kwargs['format']]
+            if FORMAT_SUFFIX in self.kwargs and self.kwargs[FORMAT_SUFFIX] in config.response_serializer:
+                return config.response_serializer[self.kwargs[FORMAT_SUFFIX]]
             return config.response_serializer.default
 
         return super(ConfigurableGenericViewSet, self).get_serializer_class()
