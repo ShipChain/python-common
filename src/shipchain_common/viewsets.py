@@ -28,6 +28,9 @@ class ActionConfiguration:
     default actions (CRUDL) to ensure no invalid or conflicting settings are provided.
     """
 
+    __action_validation_completed = False
+    __serializer_standardization_completed = False
+
     class ResponseSerializers:
         def __init__(self, **kwargs):
             self.__dict__.update(**kwargs)
@@ -79,6 +82,8 @@ class ActionConfiguration:
         Validate that the provided configuration options are valid for the specific Action
         :raises AttributeError:
         """
+        if self.__action_validation_completed:
+            return
 
         if action in ['retrieve', 'list', 'destroy']:
             for attr in ['request_serializer', 'request_validation', 'success_status']:
@@ -93,6 +98,8 @@ class ActionConfiguration:
             if self.serializer or self.request_serializer or self.response_serializer:
                 raise AttributeError(f'serializers are not valid for action {action}')
 
+        self.__action_validation_completed = True
+
     def standardize_serializer_properties(self):
         """
         Final serializer options should be in `request_serializer` and `response_serializer` and not in `serializer`.
@@ -106,6 +113,9 @@ class ActionConfiguration:
 
         :raises AttributeError:
         """
+        if self.__serializer_standardization_completed:
+            return
+
         if self.serializer:
             self.request_serializer = self.serializer
             self.response_serializer = self.serializer
@@ -122,6 +132,8 @@ class ActionConfiguration:
                     self.response_serializer = ActionConfiguration.ResponseSerializers(**self.response_serializer)
                 else:
                     self.response_serializer = ActionConfiguration.ResponseSerializers(default=self.response_serializer)
+
+        self.__serializer_standardization_completed = True
 
     @property
     def raise_validation(self):
