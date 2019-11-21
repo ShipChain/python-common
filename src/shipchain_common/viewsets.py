@@ -28,9 +28,6 @@ class ActionConfiguration:
     default actions (CRUDL) to ensure no invalid or conflicting settings are provided.
     """
 
-    __action_validation_completed = False
-    __serializer_standardization_completed = False
-
     class ResponseSerializers:
         def __init__(self, **kwargs):
             self.__dict__.update(**kwargs)
@@ -44,6 +41,9 @@ class ActionConfiguration:
                  permission_classes=None,
                  required_user_permissions=None,
                  success_status=None):
+
+        self.__action_validation_completed = False
+        self.__serializer_standardization_completed = False
 
         self.serializer = serializer
         self.request_serializer = request_serializer
@@ -146,10 +146,10 @@ class ConfigurableGenericViewSet(GenericViewSet):
     but does include the base set of generic view behavior, as well as the
     logic to handle the configuration via processing ActionConfiguration objects.
     """
-    configuration = {}
-    action_user_permissions = {}
 
     def __init__(self, **kwargs):
+        self.configuration = {}
+        self.action_user_permissions = {}
         super(ConfigurableGenericViewSet, self).__init__(**kwargs)
 
         if issubclass(self.__class__, mixins.MultiSerializerViewSetMixin):
