@@ -81,6 +81,9 @@ class ActionConfiguration:
         if self.request_validation is not None and not isinstance(self.request_validation, bool):
             raise AttributeError('request_validation should be a boolean value')
 
+        if self.required_user_permissions is not None and isinstance(self.required_user_permissions, str):
+            self.required_user_permissions = [self.required_user_permissions]
+
     def validate_action(self, action):
         """
         Validate that the provided configuration options are valid for the specific Action
@@ -238,8 +241,8 @@ class ConfigurableGenericViewSet(GenericViewSet):
             return config.request_serializer
 
         if serialization_type == mixins.SerializationType.RESPONSE and config.response_serializer:
-            if FORMAT_SUFFIX in self.kwargs and self.kwargs[FORMAT_SUFFIX] in config.response_serializer:
-                return config.response_serializer[self.kwargs[FORMAT_SUFFIX]]
+            if FORMAT_SUFFIX in self.kwargs and hasattr(config.response_serializer, self.kwargs[FORMAT_SUFFIX]):
+                return getattr(config.response_serializer, self.kwargs[FORMAT_SUFFIX])
             return config.response_serializer.default
 
         return super(ConfigurableGenericViewSet, self).get_serializer_class()
