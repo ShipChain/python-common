@@ -207,14 +207,13 @@ category = "main"
 description = "A Django REST framework API adapter for the JSON API spec."
 name = "djangorestframework-jsonapi"
 optional = false
-python-versions = "*"
-version = "2.8.0"
+python-versions = ">=3.5"
+version = "3.0.0"
 
 [package.dependencies]
 django = ">=1.11"
-djangorestframework = ">=3.6.3"
+djangorestframework = ">=3.10"
 inflection = ">=0.3.0"
-six = "*"
 
 [[package]]
 category = "main"
@@ -291,7 +290,7 @@ description = "Python Git Library"
 name = "gitpython"
 optional = false
 python-versions = ">=3.0, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "3.0.4"
+version = "3.0.5"
 
 [package.dependencies]
 gitdb2 = ">=2.0.0"
@@ -570,7 +569,7 @@ description = "Python parsing module"
 name = "pyparsing"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-version = "2.4.4"
+version = "2.4.5"
 
 [[package]]
 category = "dev"
@@ -608,7 +607,7 @@ description = "A Django plugin for pytest."
 name = "pytest-django"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "3.6.0"
+version = "3.7.0"
 
 [package.dependencies]
 pytest = ">=3.6"
@@ -619,7 +618,7 @@ description = "Thin-wrapper around the mock package for easier use with py.test"
 name = "pytest-mock"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "1.11.2"
+version = "1.12.1"
 
 [package.dependencies]
 pytest = ">=2.7"
@@ -771,7 +770,7 @@ description = "Extract the top-level domain (TLD) from the URL given."
 name = "tld"
 optional = false
 python-versions = "*"
-version = "0.9.7"
+version = "0.9.8"
 
 [package.dependencies]
 six = ">=1.9"
@@ -791,7 +790,7 @@ description = "HTTP library with thread-safe connection pooling, file post, and 
 name = "urllib3"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
-version = "1.25.6"
+version = "1.25.7"
 
 [[package]]
 category = "dev"
@@ -814,7 +813,7 @@ version = "0.6.0"
 more-itertools = "*"
 
 [metadata]
-content-hash = "777909f8bb2464cf01348d703ca20a113666cf57e3f378b3b6a66a24d9c12dd8"
+content-hash = "096ea4a2d1d607f403bf0274f2fe31dae306accf8d8bb5d7d86f69dc8c6031eb"
 python-versions = ">=3.6,<3.8"  # Compatible python versions must be declared here
 
 [metadata.hashes]
@@ -837,14 +836,14 @@ django = ["16040e1288c6c9f68c6da2fe75ebde83c0a158f6f5d54f4c5177b0c1478c5b86", "8
 django-enumfields = ["6a69868afac1ce6153760fdcce74361dac7b74bdf0c5cf58c7456aa731cf2d4b"]
 django-influxdb-tagged-metrics = ["f2a7c8dee5b32835b450474cc898e9842a4b9bfe10d8ba9f3f51eba9e45eaa5f"]
 djangorestframework = ["5488aed8f8df5ec1d70f04b2114abc52ae6729748a176c453313834a9ee179c8", "dc81cbf9775c6898a580f6f1f387c4777d12bd87abf0f5406018d32ccae71090"]
-djangorestframework-jsonapi = ["4cc55af703b9d312d0c3424201ba6cbae0d14c3c5bdf64b3f6270110379f0106", "574171f1457b905dcd0c0197e91111c44f636376823b4856709a80176cc69160"]
+djangorestframework-jsonapi = ["1610aef92e211f3904fb8d51ad1f3cd6f1256f617169eb63524bb053430d98b2", "61d28ac49274815b1735d87b7ab93f38b481916ddfa7231509de297fd27e5b3b"]
 djangorestframework-simplejwt = []
 docutils = ["6c4f696463b79f1fb8ba0c594b63840ebd41f059e92b31957c46b74a4599b6d0", "9e4d7ecfc600058e07ba661411a2b7de2fd0fafa17d1a7f7361cd47b1175c827", "a2aeea129088da402665e92e0b25b04b073c04b2dce4ab65caaa38b7ce2e1a99"]
 dodgy = ["65e13cf878d7aff129f1461c13cb5fd1bb6dfe66bb5327e09379c3877763280c"]
 dparse = ["00a5fdfa900629e5159bf3600d44905b333f4059a3366f28e0dbd13eeab17b19", "cef95156fa0adedaf042cd42f9990974bec76f25dfeca4dc01f381a243d5aa5b"]
 drf-nested-routers = ["46e5c3abc15c782cafafd7d75028e8f9121bbc6228e3599bbb48a3daa4585034", "60c1e1f5cc801e757d26a8138e61c44419ef800c213c3640c5b6138e77d46762"]
 gitdb2 = ["1b6df1433567a51a4a9c1a5a0de977aa351a405cc56d7d35f3388bad1f630350", "96bbb507d765a7f51eb802554a9cfe194a174582f772e0d89f4e87288c288b7b"]
-gitpython = ["3237caca1139d0a7aa072f6735f5fd2520de52195e0fa1d8b83a9b212a2498b2", "a7d6bef0775f66ba47f25911d285bcd692ce9053837ff48a120c2b8cf3a71389"]
+gitpython = ["9c2398ffc3dcb3c40b27324b316f08a4f93ad646d5a6328cafbb871aa79f5e42", "c155c6a2653593ccb300462f6ef533583a913e17857cfef8fc617c246b6dc245"]
 idna = ["c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407", "ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"]
 importlib-metadata = ["aa18d7378b00b40847790e7c27e11673d7fed219354109d0e7b9e5b25dc3ad26", "d5f18a79777f3aa179c145737780282e27b508fc8fd688cb17c7a813e8bd39af"]
 inflection = ["18ea7fb7a7d152853386523def08736aa8c32636b047ade55f7578c4edeb16ca"]
@@ -871,11 +870,11 @@ pylint-celery = ["41e32094e7408d15c044178ea828dd524beedbdbe6f83f712c5e35bde1de4b
 pylint-django = ["75c69d1ec2275918c37f175976da20e2f1e1e62e067098a685cd263ffa833dfd", "c7cb6384ea7b33ea77052a5ae07358c10d377807390ef27b2e6ff997303fadb7"]
 pylint-flask = ["f4d97de2216bf7bfce07c9c08b166e978fe9f2725de2a50a9845a97de7e31517"]
 pylint-plugin-utils = ["2f30510e1c46edf268d3a195b2849bd98a1b9433229bb2ba63b8d776e1fc4d0a", "57625dcca20140f43731311cd8fd879318bf45a8b0fd17020717a8781714a25a"]
-pyparsing = ["4acadc9a2b96c19fe00932a38ca63e601180c39a189a696abce1eaab641447e1", "61b5ed888beab19ddccab3478910e2076a6b5a0295dffc43021890e136edf764"]
+pyparsing = ["20f995ecd72f2a1f4bf6b072b63b22e2eb457836601e76d6e5dfcd75436acc1f", "4ca62001be367f01bd3e92ecbb79070272a9d4964dce6a48a82ff0b8bc7e683a"]
 pytest = ["3f193df1cfe1d1609d4c583838bea3d532b18d6160fd3f55c9447fdca30848ec", "e246cf173c01169b9617fc07264b7b1316e78d7a650055235d6d897bc80d9660"]
 pytest-cov = ["cc6742d8bac45070217169f5f72ceee1e0e55b0221f54bcf24845972d3a47f2b", "cdbdef4f870408ebdbfeb44e63e07eb18bb4619fae852f6e760645fa36172626"]
-pytest-django = ["497e8d967d2ec82b3388267b2f1f037761ff34c10ebb13c534d8c5804846e4eb", "b6c900461a6a7c450dcf11736cabc289a90f5d6f28ef74c46e32e86ffd16a4bd"]
-pytest-mock = ["b3514caac35fe3f05555923eabd9546abce11571cc2ddf7d8615959d04f2c89e", "ea502c3891599c26243a3a847ccf0b1d20556678c528f86c98e3cd6d40c5cf11"]
+pytest-django = ["17592f06d51c2ef4b7a0fb24aa32c8b6998506a03c8439606cb96db160106659", "ef3d15b35ed7e46293475e6f282e71a53bcd8c6f87bdc5d5e7ad0f4d49352127"]
+pytest-mock = ["96a0cebc66e09930be2a15b03333d90b59584d3fb011924f81c14b50ee0afbba", "e5381be2608e49547f5e47633c5f81241ebf6206d17ce516a7a18d5a917e3859"]
 python-dateutil = ["063df5763652e21de43de7d9e00ccf239f953a832941e37be541614732cdfc93", "88f9287c0174266bb0d8cedd395cfba9c58e87e5ad86b2ce58859bc11be3cf02"]
 python-server-metrics = ["da123c526fe7f1cc480797acd279b8c2ab139811b917ce378787fb9bd7f51b33"]
 pytz = ["1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d", "b02c06db6cf09c12dd25137e563b31700d3b80fcc4ad23abb7a315f2789819be"]
@@ -890,8 +889,8 @@ smmap2 = ["0555a7bf4df71d1ef4218e4807bbf9b201f910174e6e08af2e138d4e517b4dde", "2
 snowballstemmer = ["209f257d7533fdb3cb73bdbd24f436239ca3b2fa67d56f6ff88e86be08cc5ef0", "df3bac3df4c2c01363f3dd2cfa78cce2840a79b9f1c2d2de9ce8d31683992f52"]
 sqlparse = ["40afe6b8d4b1117e7dff5504d7a8ce07d9a1b15aeeade8a2d10f130a834f8177", "7c3dca29c022744e95b547e867cee89f4fce4373f3549ccd8797d8eb52cdb873"]
 stevedore = ["01d9f4beecf0fbd070ddb18e5efb10567801ba7ef3ddab0074f54e3cd4e91730", "e0739f9739a681c7a1fda76a102b65295e96a144ccdb552f2ae03c5f0abe8a14"]
-tld = ["1c0020fac141d14ee43d7e55aa54cc605515b37d472e5e5612d21196ca89e3be", "cef15360ec42547a583d49ef5246936b3ace424a95c00b59c09dcbe44b289961"]
+tld = ["5963b22029e632a17bde87e35a19dc8c5b17266fb8c58e4d550d5593307e3a72", "80aac213032afe9b4f29f605154ea5ca0e329d2c299cd844853075a201cf0921"]
 typed-ast = ["1170afa46a3799e18b4c977777ce137bb53c7485379d9706af8a59f2ea1aa161", "18511a0b3e7922276346bcb47e2ef9f38fb90fd31cb9223eed42c85d1312344e", "262c247a82d005e43b5b7f69aff746370538e176131c32dda9cb0f324d27141e", "2b907eb046d049bcd9892e3076c7a6456c93a25bebfe554e931620c90e6a25b0", "354c16e5babd09f5cb0ee000d54cfa38401d8b8891eefa878ac772f827181a3c", "48e5b1e71f25cfdef98b013263a88d7145879fbb2d5185f2a0c79fa7ebbeae47", "4e0b70c6fc4d010f8107726af5fd37921b666f5b31d9331f0bd24ad9a088e631", "630968c5cdee51a11c05a30453f8cd65e0cc1d2ad0d9192819df9978984529f4", "66480f95b8167c9c5c5c87f32cf437d585937970f3fc24386f313a4c97b44e34", "71211d26ffd12d63a83e079ff258ac9d56a1376a25bc80b1cdcdf601b855b90b", "7954560051331d003b4e2b3eb822d9dd2e376fa4f6d98fee32f452f52dd6ebb2", "838997f4310012cf2e1ad3803bce2f3402e9ffb71ded61b5ee22617b3a7f6b6e", "95bd11af7eafc16e829af2d3df510cecfd4387f6453355188342c3e79a2ec87a", "bc6c7d3fa1325a0c6613512a093bc2a2a15aeec350451cbdf9e1d4bffe3e3233", "cc34a6f5b426748a507dd5d1de4c1978f2eb5626d51326e43280941206c209e1", "d755f03c1e4a51e9b24d899561fec4ccaf51f210d52abdf8c07ee2849b212a36", "d7c45933b1bdfaf9f36c579671fec15d25b06c8398f113dab64c18ed1adda01d", "d896919306dd0aa22d0132f62a1b78d11aaf4c9fc5b3410d3c666b818191630a", "fdc1c9bbf79510b76408840e009ed65958feba92a88833cdceecff93ae8fff66", "ffde2fbfad571af120fcbfbbc61c72469e72f550d676c3342492a9dfdefb8f12"]
-urllib3 = ["3de946ffbed6e6746608990594d08faac602528ac7015ac28d33cee6a45b7398", "9a107b99a5393caf59c7aa3c1249c16e6879447533d0887f4336dde834c7be86"]
+urllib3 = ["a8a318824cc77d1fd4b2bec2ded92646630d7fe8619497b142c84a9e6f5a7293", "f3c5fd51747d450d4dcf6f923c81f78f811aab8205fda64b0aba34a4e48b0745"]
 wrapt = ["565a021fd19419476b9362b05eeaa094178de64f8361e44468f9e9d7843901e1"]
 zipp = ["3718b1cbcd963c7d4c5511a8240812904164b7f381b647143a89d3b98f9bcd8e", "f06903e9f1f43b12d371004b4ac7b06ab39a44adc747266928ae6debfa7b3335"]
