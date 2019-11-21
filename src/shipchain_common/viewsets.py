@@ -29,6 +29,10 @@ class ActionConfiguration:
     """
 
     class ResponseSerializers:
+        """
+        Response can be serialized multiple ways depending on FORMAT_SUFFIX_KWARG.
+        This class holds references to the serializers used for each case.
+        """
         def __init__(self, **kwargs):
             self.__dict__.update(**kwargs)
 
@@ -146,10 +150,10 @@ class ConfigurableGenericViewSet(GenericViewSet):
     but does include the base set of generic view behavior, as well as the
     logic to handle the configuration via processing ActionConfiguration objects.
     """
+    configuration = None
+    action_user_permissions = None
 
     def __init__(self, **kwargs):
-        self.configuration = {}
-        self.action_user_permissions = {}
         super(ConfigurableGenericViewSet, self).__init__(**kwargs)
 
         if issubclass(self.__class__, mixins.MultiSerializerViewSetMixin):
@@ -158,11 +162,20 @@ class ConfigurableGenericViewSet(GenericViewSet):
         if issubclass(self.__class__, mixins.MultiPermissionViewSetMixin):
             raise AttributeError(f'Cannot use MultiPermissionViewSetMixin when using ConfigurableGenericViewSet')
 
+    def _process_configurations(self):
+
+        assert self.configuration is not None, (
+            "'%s' should include a `configuration` attribute."
+            % self.__class__.__name__
+        )
+
         for action, config in self.configuration.items():
             config.validate_action(action)
             config.standardize_serializer_properties()
 
             if config.required_user_permissions:
+                if self.action_user_permissions is None:
+                    self.action_user_permissions = {}
                 self.action_user_permissions[action] = config.required_user_permissions
 
     def get_configuration(self):
@@ -170,6 +183,8 @@ class ConfigurableGenericViewSet(GenericViewSet):
         Return the ActionConfiguration for the specific action taking place.  If no defined ActionConfiguration
         exists then return an empty ActionConfiguration.  All ActionConfiguration properties are initialized to None
         """
+        self._process_configurations()
+
         action = self.action
 
         # PUT and PATCH should use the same configuration
