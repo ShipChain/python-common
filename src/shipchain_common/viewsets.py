@@ -190,11 +190,13 @@ class ConfigurableGenericViewSet(GenericViewSet):
         action = self.action
 
         # PUT and PATCH should use the same configuration
+        # pylint: disable=unsupported-membership-test
         if action == 'partial_update' and 'partial_update' not in self.configuration:
             action = 'update'
 
+        # pylint: disable=unsupported-membership-test
         if action in self.configuration:
-            return self.configuration[action]
+            return self.configuration[action]  # pylint: disable=unsubscriptable-object
 
         return ActionConfiguration()
 

@@ -179,7 +179,6 @@ class ConfigurableUpdateModelMixin(mixins.UpdateModelMixin):
 
 class ConfigurableDestroyModelMixin(mixins.DestroyModelMixin):
     """No specific Configurable changes; creating mixin for consistency"""
-    pass
 
 
 class ConfigurableListModelMixin(mixins.ListModelMixin):
