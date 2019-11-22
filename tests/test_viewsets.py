@@ -282,9 +282,9 @@ class TestActionConfiguration:
         assert 'other' in config.response_serializer
         assert config.response_serializer['other'] == CustomActionSerializer
 
-        with pytest.raises(AssertionError) as ass_err:
+        with pytest.raises(AttributeError) as attr_err:
             config.standardize_serializer_properties()
-        assert 'response_serializer needs a default provided' in str(ass_err.value)
+        assert 'response_serializer needs a default provided' in str(attr_err.value)
 
     def test_standardize_response_dict_many(self):
         """
@@ -333,13 +333,13 @@ class TestActionConfiguration:
         Providing response_serializer as a dict without a default should raise an AttributeError
         """
 
-        with pytest.raises(AssertionError) as ass_err:
+        with pytest.raises(AttributeError) as attr_err:
             ActionConfiguration(
                 response_serializer=ActionConfiguration.ResponseSerializers(
                     other=CustomActionSerializer,
                 )
             )
-        assert 'response_serializer needs a default provided' in str(ass_err.value)
+        assert 'response_serializer needs a default provided' in str(attr_err.value)
 
     def test_standardize_response_class_many(self):
         """
@@ -397,9 +397,9 @@ class TestConfigurableGenericViewSet:
         assert 'Cannot use MultiPermissionViewSetMixin when using ConfigurableGenericViewSet' in str(attr_err.value)
     
     def test_needs_configuration(self, viewset):
-        with pytest.raises(AssertionError) as ass_err:
+        with pytest.raises(AttributeError) as attr_err:
             viewset.get_configuration()
-        assert '\'TestViewSet\' should include a `configuration` attribute.' in str(ass_err.value)
+        assert 'TestViewSet should include a `configuration` attribute.' in str(attr_err.value)
 
     def test_configurable_generic_view_set(self, viewset):
         viewset.configuration = {

@@ -36,7 +36,8 @@ class ActionConfiguration:
         def __init__(self, **kwargs):
             self.default = None
             self.__dict__.update(**kwargs)
-            assert self.default is not None, "response_serializer needs a default provided"
+            if self.default is None:
+                raise AttributeError(f'response_serializer needs a default provided')
 
     # pylint: disable=too-many-arguments
     def __init__(self,
@@ -167,10 +168,8 @@ class ConfigurableGenericViewSet(GenericViewSet):
 
     def _process_configurations(self):
 
-        assert self.configuration is not None, (
-            "'%s' should include a `configuration` attribute."
-            % self.__class__.__name__
-        )
+        if self.configuration is None:
+            raise AttributeError(f'{self.__class__.__name__} should include a `configuration` attribute.')
 
         for action, config in self.configuration.items():
             config.validate_action(action)
