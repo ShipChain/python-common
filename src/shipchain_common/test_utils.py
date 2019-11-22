@@ -19,13 +19,15 @@ import re
 import random
 from datetime import datetime, timedelta
 from unittest.mock import Mock
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import jwt
 from django.conf import settings
 from django.test.client import encode_multipart
 from requests.models import Response
 from rest_framework_simplejwt.utils import aware_utcnow, datetime_to_epoch
+
+from src.shipchain_common.utils import validate_uuid4
 
 
 def create_form_content(data):
@@ -214,28 +216,6 @@ def second_mocked_wallet_valid_creation():
         },
         "id": 0
     })
-
-
-def validate_uuid4(uuid_string):
-    """
-    Validate that a UUID string is in fact a valid uuid4.
-    Happily, the uuid module does the actual checking for us.
-    It is vital that the 'version' kwarg be passed to the UUID() call
-    otherwise any 32-character hex string is considered valid.
-    """
-
-    try:
-        val = UUID(uuid_string, version=4)
-    except ValueError:
-        # If it's a value error, then the string
-        # is not a valid hex code for a UUID.
-        return False
-
-    # If the uuid_string is a valid hex code,
-    # but an invalid uuid4,
-    # the UUID.__init__ will convert it to a
-    # valid uuid4. This is bad for validation purposes.
-    return val.hex == uuid_string.replace('-', '')
 
 
 def valid_eth_amount():

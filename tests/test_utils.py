@@ -7,7 +7,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.utils import timezone
 
-from src.shipchain_common.utils import assertDeepAlmostEqual, random_id, tznow, snake_to_sentence
+from src.shipchain_common.utils import assertDeepAlmostEqual, random_id, tznow, snake_to_sentence, validate_uuid4
 from src.shipchain_common.test_utils import datetimeAlmostEqual
 
 TEST_UUIDS = ['uuid_{}'.format(i) for i in range(10000)]
@@ -33,6 +33,17 @@ def test_random_id(test_uuids):
         test1 = random_id()
         assert type(test1) == str
         assert test1 == 'test1_uuid_0'
+
+
+def test_uuid4_validator():
+    valid_uuid4 = str(uuid.uuid4())
+    assert validate_uuid4(valid_uuid4)
+    uuid4_no_dashes = valid_uuid4.replace('-', '')
+    assert not validate_uuid4(uuid4_no_dashes)
+    hex32str = '08E7CF0B-97F3-04A0-4377-B989DC61B100'
+    assert not validate_uuid4(hex32str)
+    garbage = 'ga-r-b-age'
+    assert not validate_uuid4(garbage)
 
 
 def test_tznow(mock_now):
