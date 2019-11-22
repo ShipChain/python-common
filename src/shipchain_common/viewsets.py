@@ -34,7 +34,9 @@ class ActionConfiguration:
         This class holds references to the serializers used for each case.
         """
         def __init__(self, **kwargs):
+            self.default = None
             self.__dict__.update(**kwargs)
+            assert self.default is not None, "response_serializer needs a default provided"
 
     # pylint: disable=too-many-arguments
     def __init__(self,
@@ -134,8 +136,6 @@ class ActionConfiguration:
         if self.response_serializer:
             if not isinstance(self.response_serializer, ActionConfiguration.ResponseSerializers):
                 if isinstance(self.response_serializer, dict):
-                    if 'default' not in self.response_serializer:
-                        raise AttributeError('response_serializer needs a default provided')
                     self.response_serializer = ActionConfiguration.ResponseSerializers(**self.response_serializer)
                 else:
                     self.response_serializer = ActionConfiguration.ResponseSerializers(default=self.response_serializer)
