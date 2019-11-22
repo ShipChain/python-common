@@ -42,6 +42,8 @@ def test_uuid4_validator():
     assert not validate_uuid4(uuid4_no_dashes)
     hex32str = '08E7CF0B-97F3-04A0-4377-B989DC61B100'
     assert not validate_uuid4(hex32str)
+    hex32str_no_dashes = '08E7CF0B97F304A04377B989DC61B100'
+    assert not validate_uuid4(hex32str_no_dashes)
     garbage = 'ga-r-b-age'
     assert not validate_uuid4(garbage)
 
