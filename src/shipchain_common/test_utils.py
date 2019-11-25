@@ -27,7 +27,7 @@ from django.test.client import encode_multipart
 from requests.models import Response
 from rest_framework_simplejwt.utils import aware_utcnow, datetime_to_epoch
 
-from src.shipchain_common.utils import validate_uuid4
+from .utils import validate_uuid4  # Imported for backwards compatibility usage of `from shipchain_common.test_utils`...
 
 
 def create_form_content(data):
