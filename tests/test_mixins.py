@@ -1,5 +1,5 @@
 import pytest
-from shipchain_common.views import MultiSerializerViewSetMixin, MultiPermissionViewSetMixin
+from shipchain_common.mixins import MultiSerializerViewSetMixin, MultiPermissionViewSetMixin
 
 
 class FakePermission:

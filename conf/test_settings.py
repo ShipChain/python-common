@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives.serialization import load_pem_public_key
 
 ENVIRONMENT = 'TEST'
 
+FORMAT_SUFFIX_KWARG = 'format'
 
 DEBUG = True
 
