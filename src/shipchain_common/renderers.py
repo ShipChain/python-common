@@ -8,6 +8,9 @@ def _get_resource_name(context, expand_polymorphic_types=False):
     """
     Return the name of a resource with a special override for ConfigurableGenericViewSet's multiple serializers
     """
+    if CGVSJsonRenderer.original_get_resource_name is None:
+        raise Exception('original_get_resource_name was not captured')
+
     view = context.get('view')
     is_response = context.get('response', False)
 
@@ -28,6 +31,7 @@ def _get_resource_name(context, expand_polymorphic_types=False):
 
         # Force the default method to find our serializer at view.resource_name and reset when we're done
         setattr(view, 'resource_name', resource_name)
+        # pylint: disable=not-callable
         resource_name = CGVSJsonRenderer.original_get_resource_name(context, expand_polymorphic_types)
         setattr(view, 'resource_name', original_view_resource_name)
 
@@ -35,6 +39,7 @@ def _get_resource_name(context, expand_polymorphic_types=False):
 
     # For any exceptions above, fallback to original method
     except AttributeError:
+        # pylint: disable=not-callable
         return CGVSJsonRenderer.original_get_resource_name(context, expand_polymorphic_types)
 
 
