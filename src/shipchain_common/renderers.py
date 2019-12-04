@@ -2,7 +2,6 @@ from rest_framework_json_api import renderers, utils
 from rest_framework_json_api.serializers import PolymorphicModelSerializer
 
 from .mixins import SerializationType
-from .viewsets import ConfigurableGenericViewSet
 
 
 def _get_resource_name(context, expand_polymorphic_types=False):
@@ -23,6 +22,7 @@ def _get_resource_name(context, expand_polymorphic_types=False):
             raise AttributeError
 
         # If view is not a ConfigurableGenericViewSet, don't try to get configurable serializer
+        from .viewsets import ConfigurableGenericViewSet
         if not isinstance(view, ConfigurableGenericViewSet):
             raise AttributeError
 
