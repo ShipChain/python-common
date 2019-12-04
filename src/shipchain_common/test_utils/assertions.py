@@ -144,27 +144,37 @@ def _vnd_assertions(response_data, entity_ref):
         _vnd_assert_relationships(response_data, entity_ref.relationships)
 
 
+def _assert_attributes_in_response(response, attributes):
+    for key, value in attributes.items():
+        assert key in response, f'Missing Attribute `{key}` in {response}'
+        if isinstance(value, dict):
+            _assert_attributes_in_response(response[key], value)
+        else:
+            assert response[key] == value, f'Attribute Value incorrect `{value}` in {response}'
+
+
 def response_has_data(response, vnd=True, entity_refs=None, included=None, is_list=False,
                       resource=None, pk=None, attributes=None, relationships=None):
     response = response.json()
 
-    # if (attributes or relationships or resource or pk) and entity_refs:
-    assert not ((attributes or relationships or resource or pk) and entity_refs), \
-        'Use Only `entity_refs` or explicit `attributes`, `relationships`, `resource`, and `pk` but not both'
-
-    if (attributes or relationships or resource or pk) and not entity_refs:
-        entity_refs = EntityReferenceClass(resource=resource,
-                                           pk=pk,
-                                           attributes=attributes,
-                                           relationships=relationships)
-
     # application/vnd.api+json
     if vnd:
+        assert 'data' in response, f'response does not contain `data` property: {response}'
+
+        # if (attributes or relationships or resource or pk) and entity_refs:
+        assert not ((attributes or relationships or resource or pk) and entity_refs), \
+            'Use Only `entity_refs` or explicit `attributes`, `relationships`, `resource`, and `pk` but not both'
+
+        if (attributes or relationships or resource or pk) and not entity_refs:
+            entity_refs = EntityReferenceClass(resource=resource,
+                                               pk=pk,
+                                               attributes=attributes,
+                                               relationships=relationships)
+
         response_data = response['data']
 
         if is_list:
-            if not isinstance(response_data, list):
-                assert False, f'Response should be a list'
+            assert isinstance(response_data, list), f'Response should be a list'
 
             # Included resources are outside of the list response
             if included:
@@ -179,10 +189,9 @@ def response_has_data(response, vnd=True, entity_refs=None, included=None, is_li
                     _vnd_assert_entity_ref_in_list(response_data, entity_ref)
 
         else:
-            if isinstance(response_data, list):
-                assert False, f'Response should not be a list'
-            if entity_refs and isinstance(entity_refs, list):
-                assert False, f'entity_refs should not be a list for a non-list response'
+            assert not isinstance(response_data, list), f'Response should not be a list'
+            assert not (entity_refs and isinstance(entity_refs, list)), \
+                f'entity_refs should not be a list for a non-list response'
 
             # Included resources are outside of the list response
             if included:
@@ -194,10 +203,12 @@ def response_has_data(response, vnd=True, entity_refs=None, included=None, is_li
 
     # application/json
     else:
+        assert not relationships, f'relationships not valid when vnd=False'
+        assert not entity_refs, f'entity_refs not valid when vnd=False'
+        assert not included, f'included not valid when vnd=False'
         assert attributes, f'attributes must be provided when vnd=False'
 
-        for key, value in attributes.items():
-            assert response[key] == value, f'{response}'
+        _assert_attributes_in_response(response, attributes)
 
 
 def assert_200(response, vnd=True, entity_refs=None, included=None, is_list=False,

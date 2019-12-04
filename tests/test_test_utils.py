@@ -5,6 +5,15 @@ import pytest
 from rest_framework import status
 from shipchain_common.test_utils import AssertionHelper
 
+EXAMPLE_PLAIN = {
+    'id': '07b374c3-ed9b-4811-901a-d0c5d746f16a',
+    'name': 'example 1',
+    'field_1': 1,
+    'owner': {
+        'username': 'user1'
+    }
+}
+
 EXAMPLE_USER = {
     'type': 'User',
     'id': '07b374c3-ed9b-4811-901a-d0c5d746f16a',
@@ -272,6 +281,13 @@ class TestAssertionHelper:
             assertions.HTTP_200(response, entity_refs=assertions.EntityRef(), pk='test')
         assert 'Use Only `entity_refs` or explicit `attributes`, `relationships`, `resource`, and `pk` but not both' \
                in str(err.value)
+
+    def test_vnd_with_non_jsonapi_data(self, assertions):
+        response = self.build_response(EXAMPLE_PLAIN)
+
+        with pytest.raises(AssertionError) as err:
+            assertions.HTTP_200(response, attributes=EXAMPLE_PLAIN)
+        assert f'response does not contain `data` property' in str(err.value)
 
     def test_vnd_is_list(self, assertions, vnd_single, vnd_list):
         single_response = self.build_response(vnd_single)
@@ -622,3 +638,69 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             assertions.HTTP_200(response, is_list=True, entity_refs=[entity_1, entity_2])
         assert f'{entity_2} NOT IN' in str(err.value)
+
+    def test_plain_json_valid_parameters(self, assertions):
+        response = self.build_response(EXAMPLE_PLAIN)
+
+        with pytest.raises(AssertionError) as err:
+            assertions.HTTP_200(response, vnd=False, entity_refs={assertions.EntityRef()})
+        assert f'entity_refs not valid when vnd=False' in str(err.value)
+
+        with pytest.raises(AssertionError) as err:
+            assertions.HTTP_200(response, vnd=False, relationships=assertions.EntityRef())
+        assert f'relationships not valid when vnd=False' in str(err.value)
+
+        with pytest.raises(AssertionError) as err:
+            assertions.HTTP_200(response, vnd=False, included=assertions.EntityRef())
+        assert f'included not valid when vnd=False' in str(err.value)
+
+        with pytest.raises(AssertionError) as err:
+            assertions.HTTP_200(response, vnd=False)
+        assert f'attributes must be provided when vnd=False' in str(err.value)
+
+    def test_plain_json_attributes(self, assertions):
+        response = self.build_response(EXAMPLE_PLAIN)
+
+        assertions.HTTP_200(response, vnd=False, attributes=EXAMPLE_PLAIN)
+
+    def test_plain_json_attributes_top_level_missing(self, assertions):
+        response = self.build_response(EXAMPLE_PLAIN)
+
+        invalid_attributes = EXAMPLE_PLAIN.copy()
+        invalid_attributes['new_field'] = 1
+
+        with pytest.raises(AssertionError) as err:
+            assertions.HTTP_200(response, vnd=False, attributes=invalid_attributes)
+        assert f'Missing Attribute `new_field` in ' in str(err.value)
+
+    def test_plain_json_attributes_top_level_mismatch(self, assertions):
+        response = self.build_response(EXAMPLE_PLAIN)
+
+        invalid_attributes = EXAMPLE_PLAIN.copy()
+        invalid_attributes['id'] = 1
+
+        with pytest.raises(AssertionError) as err:
+            assertions.HTTP_200(response, vnd=False, attributes=invalid_attributes)
+        assert f'Attribute Value incorrect `1` in ' in str(err.value)
+
+    def test_plain_json_attributes_nested_missing(self, assertions):
+        response = self.build_response(EXAMPLE_PLAIN)
+
+        invalid_attributes = EXAMPLE_PLAIN.copy()
+        invalid_attributes['owner'] = EXAMPLE_PLAIN['owner'].copy()
+        invalid_attributes['owner']['new_field'] = 'test'
+
+        with pytest.raises(AssertionError) as err:
+            assertions.HTTP_200(response, vnd=False, attributes=invalid_attributes)
+        assert f'Missing Attribute `new_field` in ' in str(err.value)
+
+    def test_plain_json_attributes_nested_mismatch(self, assertions):
+        response = self.build_response(EXAMPLE_PLAIN)
+
+        invalid_attributes = EXAMPLE_PLAIN.copy()
+        invalid_attributes['owner'] = EXAMPLE_PLAIN['owner'].copy()
+        invalid_attributes['owner']['id'] = 'test'
+
+        with pytest.raises(AssertionError) as err:
+            assertions.HTTP_200(response, vnd=False, attributes=invalid_attributes)
+        assert f'Missing Attribute `id` in ' in str(err.value)
