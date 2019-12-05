@@ -14,6 +14,24 @@ EXAMPLE_PLAIN = {
     }
 }
 
+EXAMPLE_PLAIN_2 = {
+    'id': 'bf0d0b89-482f-40dd-b29b-9e5e05b83ed6',
+    'name': 'example 2',
+    'field_1': 2,
+    'owner': {
+        'username': 'user2'
+    }
+}
+
+EXAMPLE_PLAIN_3 = {
+    'id': '2aa1db84-6618-4e35-9b2a-f450c20699fe',
+    'name': 'example 3',
+    'field_1': 3,
+    'owner': {
+        'username': 'user3'
+    }
+}
+
 EXAMPLE_USER = {
     'type': 'User',
     'id': '07b374c3-ed9b-4811-901a-d0c5d746f16a',
@@ -704,3 +722,54 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             json_asserter.HTTP_200(response, vnd=False, attributes=invalid_attributes)
         assert f'Missing Attribute `id` in ' in str(err.value)
+
+    def test_plain_json_attributes_list_assertions(self, json_asserter):
+        single_response = self.build_response(EXAMPLE_PLAIN)
+        list_response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(single_response, vnd=False, is_list=True, attributes=EXAMPLE_PLAIN)
+        assert f'Response should be a list' in str(err.value)
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(list_response, vnd=False, attributes=EXAMPLE_PLAIN)
+        assert f'Response should not be a list' in str(err.value)
+
+    def test_plain_json_attributes_list_single_match(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+        json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=EXAMPLE_PLAIN)
+
+    def test_plain_json_attributes_list_both_match(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+        json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=[EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+    def test_plain_json_attributes_list_one_missing(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=[EXAMPLE_PLAIN, EXAMPLE_PLAIN_3])
+        assert f'{EXAMPLE_PLAIN_3} NOT IN ' in str(err.value)
+
+    def test_plain_json_attributes_list_nested_missing(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+        invalid_attributes = EXAMPLE_PLAIN.copy()
+        invalid_attributes['owner'] = EXAMPLE_PLAIN['owner'].copy()
+        invalid_attributes['owner']['new_field'] = 'test'
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=invalid_attributes)
+        assert f'{invalid_attributes} NOT IN ' in str(err.value)
+
+    def test_plain_json_attributes_list_nested_mismatch(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+        invalid_attributes = EXAMPLE_PLAIN.copy()
+        invalid_attributes['owner'] = EXAMPLE_PLAIN['owner'].copy()
+        invalid_attributes['owner']['id'] = 'test'
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=invalid_attributes)
+        assert f'{invalid_attributes} NOT IN ' in str(err.value)

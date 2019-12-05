@@ -144,13 +144,33 @@ def _vnd_assertions(response_data, entity_ref):
         _vnd_assert_relationships(response_data, entity_ref.relationships)
 
 
-def _assert_attributes_in_response(response, attributes):
+def _plain_assert_attributes_in_response(response, attributes):
     for key, value in attributes.items():
         assert key in response, f'Missing Attribute `{key}` in {response}'
         if isinstance(value, dict):
-            _assert_attributes_in_response(response[key], value)
+            _plain_assert_attributes_in_response(response[key], value)
         else:
             assert response[key] == value, f'Attribute Value incorrect `{value}` in {response}'
+
+
+def _plain_assert_attributes_in_list(response_list, attributes):
+    found_include = False
+
+    if attributes is None:
+        attributes = dict()
+
+    for response_single in response_list:
+        single_attribute_failed = False
+
+        try:
+            _plain_assert_attributes_in_response(response_single, attributes)
+        except AssertionError:
+            single_attribute_failed = True
+
+        if not single_attribute_failed:
+            found_include = True
+
+    assert found_include, f'{attributes} NOT IN  {response_list}'
 
 
 def response_has_data(response, vnd=True, entity_refs=None, included=None, is_list=False,
@@ -208,7 +228,20 @@ def response_has_data(response, vnd=True, entity_refs=None, included=None, is_li
         assert not included, f'included not valid when vnd=False'
         assert attributes, f'attributes must be provided when vnd=False'
 
-        _assert_attributes_in_response(response, attributes)
+        if is_list:
+            assert isinstance(response, list), f'Response should be a list'
+
+            if not isinstance(attributes, list):
+                attributes = [attributes]
+
+            for attribute in attributes:
+                _plain_assert_attributes_in_list(response, attribute)
+        else:
+            assert not isinstance(response, list), f'Response should not be a list'
+            assert not (attributes and isinstance(attributes, list)), \
+                f'attributes should not be a list for a non-list response'
+
+            _plain_assert_attributes_in_response(response, attributes)
 
 
 def assert_200(response, vnd=True, entity_refs=None, included=None, is_list=False,
