@@ -270,7 +270,21 @@ class TestAssertionHelper:
             json_asserter.HTTP_404(response)
         assert 'status_code 200 != 404' in str(err.value)
 
-    def test_status_wrong_message(self, json_asserter, vnd_single, vnd_error_404):
+    def test_status_wrong_message(self, json_asserter, vnd_error_404):
+        response = self.build_response(vnd_error_404, status_code=status.HTTP_404_NOT_FOUND)
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_404(response, error='Not the correct error')
+        assert f'Error `Not the correct error` not found in' in str(err.value)
+
+    def test_status_in_second_error(self, json_asserter, vnd_error_404):
+        vnd_error_404['errors'].append({'detail': 'another error'})
+        response = self.build_response(vnd_error_404, status_code=status.HTTP_404_NOT_FOUND)
+
+        json_asserter.HTTP_404(response, error='another error')
+
+    def test_status_missing_in_multiple_errors(self, json_asserter, vnd_error_404):
+        vnd_error_404['errors'].append({'detail': 'another error'})
         response = self.build_response(vnd_error_404, status_code=status.HTTP_404_NOT_FOUND)
 
         with pytest.raises(AssertionError) as err:

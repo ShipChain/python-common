@@ -36,7 +36,17 @@ class EntityReferenceClass:
 def response_has_error(response, error):
     if error is not None:
         response_json = response.json()
-        assert error in response_json['errors'][0]['detail'], f'Error `{error}` not found in {response_json}'
+        assert 'errors' in response_json, f'Malformed error response: {response_json}'
+        assert isinstance(response_json['errors'], list), f'Error response not a list: {response_json}'
+
+        error_found = False
+
+        for single_error in response_json['errors']:
+            if error in single_error['detail']:
+                error_found = True
+
+        if not error_found:
+            assert False, f'Error `{error}` not found in {response_json}'
 
 
 def _vnd_assert_attributes(response_data, attributes):
