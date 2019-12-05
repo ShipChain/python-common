@@ -61,7 +61,7 @@ def _vnd_assert_attributes(response_data, attributes):
         assert response_attributes[key] == value, f'Attribute Value incorrect `{value}` in {response_attributes}'
 
 
-def _vnd_assert_entity_ref_in_list(response_list, entity_ref):
+def _vnd_assert_entity_ref_in_list(response_list, entity_ref, skip_attributes_property=False):
     found_include = False
 
     if entity_ref.attributes is None:
@@ -71,6 +71,8 @@ def _vnd_assert_entity_ref_in_list(response_list, entity_ref):
         if entity_ref.resource and entity_ref.pk:
             if response_single['type'] == entity_ref.resource and response_single['id'] == entity_ref.pk:
                 found_include = True
+                if skip_attributes_property:
+                    break
                 for attr_key, attr_value in entity_ref.attributes.items():
                     assert attr_key in response_single['attributes'], \
                         f'List Attribute key `{attr_key}` missing in {response_single}'
@@ -113,7 +115,8 @@ def _vnd_assert_relationships(response_data, relationships):
                 f'asserted relationship is not an EntityRef {relationship_ref}'
 
             if 'meta' in response_relationships[relationship_name]:
-                _vnd_assert_entity_ref_in_list(response_relationships[relationship_name]['data'], relationship_ref)
+                _vnd_assert_entity_ref_in_list(response_relationships[relationship_name]['data'], relationship_ref,
+                                               skip_attributes_property=True)
 
             else:
                 if relationship_ref.resource:
