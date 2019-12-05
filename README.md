@@ -1,4 +1,5 @@
-# shipchain-common
+# Shipchain Common Python Library
+
 A PyPI package containing shared code for ShipChain's Python/Django projects
 
 
