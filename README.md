@@ -3,16 +3,16 @@
 A PyPI package containing shared code for ShipChain's Python/Django projects
 
 
-### Pytest Fixtures
+## Pytest Fixtures
 
-When shipchain-common is installed, a pytest plugin named `assertions` is automatically registered.  This plugin is
- designed for writing concise pytest cases that make assertions about responses from a Django Rest Framework API. Most 
+When shipchain-common is installed, a pytest plugin named `json_asserter` is automatically registered.  This plugin is
+ designed for writing concise pytest cases that make json_asserter about responses from a Django Rest Framework API. Most 
  of the functionality is tailored to the `application/vnd.api+json` response type, but should still be usable for
  plain `application/json` responses.
  
-#### Assertions Fixture
+### json_asserter Fixture
 
-The `assertions` fixture exposes several methods for testing specific HTTP Status codes as well as a class for
+The `json_asserter` fixture exposes several methods for testing specific HTTP Status codes as well as a class for
  building consistent entity references that must be found within the responses.
  
 ##### Asserting Error Responses
@@ -25,7 +25,7 @@ The following will assert that the response status was 403 and that the default 
  
 ```python
 response = api_client.get(self.detail_url)
-assertions.HTTP_403(response)
+json_asserter.HTTP_403(response)
 ```
  
 If a different error message should exist, or when checking the error of a 400 response, the specific error may
@@ -33,7 +33,7 @@ If a different error message should exist, or when checking the error of a 400 r
  
 ```python
 response = api_client.get(self.detail_url)
-assertions.HTTP_400(response, error='Specific error message that should be in the respose')
+json_asserter.HTTP_400(response, error='Specific error message that should be in the respose')
 ```
 
 ##### Asserting Successful Responses
@@ -42,7 +42,7 @@ To assert that a given response must have status 200, call the HTTP_200 method w
 
 ```python
 response = api_client.get(self.detail_url)
-assertions.HTTP_200(response)
+json_asserter.HTTP_200(response)
 ```
  
 While this is valid, it is **very strongly** recommended to include additional details about the data present in the
@@ -56,7 +56,7 @@ For simple responses, the easiest way to specify required data in the responses 
   
 ```python
 response = api_client.get(self.detail_url)
-assertions.HTTP_200(response, 
+json_asserter.HTTP_200(response, 
                     resource='User', 
                     pk='4b56399d-3155-4fe5-ba4a-9718289a78b7', 
                     attributes={'username': 'example_user'})
@@ -64,7 +64,7 @@ assertions.HTTP_200(response,
 
 This will throw an assertion if the response is not for the resource type `User` with id 
 `4b56399d-3155-4fe5-ba4a-9718289a78b7` and with _at least_ the attribute username `example_user`.  If the response
- includes _additional_ attributes that are not listed in the call to the assertions method, they are ignored.  The
+ includes _additional_ attributes that are not listed in the call to the json_asserter method, they are ignored.  The
  methods check partial objects and do not require that every attribute in the response must be defined in the
  assertion.
    
@@ -80,16 +80,16 @@ For responses where the associated Relationship and any extra Included resources
   
 ```python
 response = api_client.get(self.detail_url)
-assertions.HTTP_200(response,
-                    entity_refs=assertions.EntityRef(
+json_asserter.HTTP_200(response,
+                    entity_refs=json_asserter.EntityRef(
                         resource='User', 
                         pk='4b56399d-3155-4fe5-ba4a-9718289a78b7', 
                         attributes={'username': 'example_user'},
                         relationships={
-                            'manager': assertions.EntityRef( 
+                            'manager': json_asserter.EntityRef( 
                                 resource='User', 
                                 pk='88e38305-9775-4b34-95d0-4e935bb7156c')}),
-                    included=assertions.EntityRef(
+                    included=json_asserter.EntityRef(
                         resource='User', 
                         pk='88e38305-9775-4b34-95d0-4e935bb7156c', 
                         attributes={'username': 'manager_user'}))
@@ -99,12 +99,12 @@ This requires the same original record in the response, but now also requires th
  named `manager` with the associated User and that User must be present (with at least the one attribute) in the
  `included` property of the response.
  
-The above example utilizes the `EntityRef` exposed via the `assertions` fixture.  This is a reference to a single
+The above example utilizes the `EntityRef` exposed via the `json_asserter` fixture.  This is a reference to a single
  entity defined by a combination of: ResourceType, ResourceID, Attributes, and Relationships. When providing the
  `entity_refs` argument to an assertion, you cannot provide any of the following arguments to the assertion directly:
  `resource`, `pk`, `attributes`, or `relationships`.
  
-When providing `included` assertions, you can provide either a single EntityRef or a list of EntityRef instances.  If
+When providing `included` json_asserter, you can provide either a single EntityRef or a list of EntityRef instances.  If
  a list is provided, _all_ referenced entities must be present in the `included` property of the response. As they do
  for the simple usage above, The same assertion rules apply here regarding providing a combination of `resource`, 
  `pk`, and `attributes`.

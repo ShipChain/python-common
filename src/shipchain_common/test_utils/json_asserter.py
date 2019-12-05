@@ -284,5 +284,5 @@ class AssertionHelper:
 
 
 @pytest.fixture(scope='session')
-def assertions():
+def json_asserter():
     return AssertionHelper

@@ -44,7 +44,5 @@ pytest-django = "^3.6"
 pytest-mock = "^1.10"
 safety = "^1.8"
 
-[tool.poetry.plugins] # Optional super table
-
 [tool.poetry.plugins."pytest11"]
-"assertions" = "shipchain_common.test_utils.assertions"
+"json_asserter" = "shipchain_common.test_utils.json_asserter"

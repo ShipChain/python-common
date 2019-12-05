@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from .assertions import \
-    assertions, \
+from .json_asserter import \
+    json_asserter, \
     AssertionHelper
 
 from .helpers import\
