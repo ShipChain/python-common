@@ -15,6 +15,11 @@ When shipchain-common is installed, a pytest plugin named `json_asserter` is aut
 The `json_asserter` fixture exposes several methods for testing specific HTTP Status codes as well as a class for
  building consistent entity references that must be found within the responses.
  
+#### Usage with application/vnd.api+json
+
+This is the default when utilizing the `json_asserter`.  If the response does not conform to the 
+[JSON Api standard](https://jsonapi.org/), the assertions will fail.
+ 
 ##### Asserting Error Responses
 
 To assert that a given response must have an error status, there are several 400-level response methods.  With the
@@ -114,3 +119,68 @@ The `entity_refs` parameter can be a list of EntityRef instances as well. Howeve
  response is a list, the parameter `is_list=True` must be provided. You can provide either a single EntityRef or a
  list of EntityRef instances.  If a list is provided, _all_ referenced entities must be present in the list of
  returned data.
+
+#### Usage with application/json
+
+Support is included for making assertions on plain JSON responses with `json_asserter`. To ignore the JSON API specific 
+ assertions, you must provide the `vnd=False` parameter.  Only the `attributes` parameter is valid as there are no
+ relationships or included properties in a plain json response.
+ 
+Given this response:
+
+```json
+{
+    "id": "07b374c3-ed9b-4811-901a-d0c5d746f16a",
+    "name": "example 1",
+    "field_1": 1,
+    "owner": {
+        "username": "user1"
+    }
+}
+```
+
+Asserting the top level attributes as well as nested attributes is possible using the following call:
+
+```python
+response = api_client.get(self.detail_url)
+json_asserter.HTTP_200(response, 
+                    vnd=False,
+                    attributes={
+                        'id': '07b374c3-ed9b-4811-901a-d0c5d746f16a',
+                        'owner': {
+                            'username': 'user1'
+                        }
+                    })
+```
+
+For a list response:
+
+```json
+[{
+    "username": "user1",
+    "is_active": False
+},
+{
+    "username": "user2",
+    "is_active": False
+},
+{
+    "username": "user3",
+    "is_active": False
+}]
+```
+
+It is possible to assert that one or many sets of attributes exist in the response:
+```python
+response = api_client.get(self.detail_url)
+json_asserter.HTTP_200(response, 
+                    vnd=False,
+                    is_list=True,
+                    attributes=[{
+                        "username": "user1",
+                        "is_active": False
+                    }, {
+                        "username": "user3",
+                        "is_active": False
+                    }])
+```
