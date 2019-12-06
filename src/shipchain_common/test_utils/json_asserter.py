@@ -114,7 +114,10 @@ def _vnd_assert_relationships(response_data, relationships):
             assert isinstance(relationship_ref, EntityReferenceClass), \
                 f'asserted relationship is not an EntityRef {relationship_ref}'
 
-            if 'meta' in response_relationships[relationship_name]:
+            assert 'data' in response_relationships[relationship_name], \
+                f'Data missing in {relationship_name} relationship : {response_relationships[relationship_name]}'
+
+            if isinstance(response_relationships[relationship_name]['data'], list):
                 _vnd_assert_entity_ref_in_list(response_relationships[relationship_name]['data'], relationship_ref,
                                                skip_attributes_property=True)
 
