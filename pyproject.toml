@@ -43,3 +43,6 @@ pytest-cov = "^2.6"
 pytest-django = "^3.6"
 pytest-mock = "^1.10"
 safety = "^1.8"
+
+[tool.poetry.plugins."pytest11"]
+"json_asserter" = "shipchain_common.test_utils.json_asserter"

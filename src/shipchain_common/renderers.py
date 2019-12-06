@@ -21,6 +21,11 @@ def _get_resource_name(context, expand_polymorphic_types=False):
         if original_view_resource_name:
             raise AttributeError
 
+        # If view is not a ConfigurableGenericViewSet, don't try to get configurable serializer
+        from .viewsets import ConfigurableGenericViewSet
+        if not isinstance(view, ConfigurableGenericViewSet):
+            raise AttributeError
+
         serializer = view.get_serializer_class(
             serialization_type=SerializationType.RESPONSE if is_response else SerializationType.REQUEST)
 

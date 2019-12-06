@@ -3,7 +3,7 @@ import json
 import django
 # We run django.setup() in order to auto populate the base django's app models for testing purposes
 import pytest
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework_json_api import serializers
 
@@ -56,6 +56,17 @@ class CustomActionCSVSerializer(DefaultSerializer):
 class TestCGVSJsonRenderer:
 
     @pytest.fixture
+    def standard_viewset(self):
+        class TestViewSet(viewsets.GenericViewSet):
+            kwargs = {}
+            request = {}
+            response = Response(status=status.HTTP_200_OK)
+            format_kwarg = ''
+            serializer_class = DefaultSerializer
+
+        return TestViewSet()
+
+    @pytest.fixture
     def viewset(self):
         class TestViewSet(ConfigurableGenericViewSet):
             kwargs = {}
@@ -65,6 +76,16 @@ class TestCGVSJsonRenderer:
             serializer_class = DefaultSerializer
 
         return TestViewSet()
+
+    def test_get_resource_with_standard_viewset(self, standard_viewset):
+        renderer = CGVSJsonRenderer()
+        response_data = DefaultSerializer(BasicModel(my_field='1')).data
+        renderer_context = {'view': standard_viewset, 'request': standard_viewset.request, 'response': standard_viewset.response}
+
+        standard_viewset.action = 'list'
+        response = renderer.render(response_data, renderer_context=renderer_context)
+        response = json.loads(response)
+        assert response['data']['type'] == 'DefaultSerializer'
 
     def test_get_resource_from_configurable_serializer(self, viewset):
         viewset.configuration = {
