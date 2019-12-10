@@ -67,6 +67,15 @@ EXAMPLE_RESOURCE_3 = {
     }
 }
 
+EXAMPLE_RESOURCE_4 = {
+    'type': 'ExampleResource',
+    'id': 'e8ba3cd9-9b5e-41fa-9b08-116284e968fd',
+    'attributes': {
+        'name': 'example 4',
+        'field_1': 4
+    }
+}
+
 
 class TestAssertionHelper:
 
@@ -96,12 +105,16 @@ class TestAssertionHelper:
                         },
                         'children': {
                             'meta': {
-                                'count': 1
+                                'count': 2
                             },
                             'data': [
                                 {
                                     'type': EXAMPLE_RESOURCE_2['type'],
                                     'id': EXAMPLE_RESOURCE_2['id']
+                                },
+                                {
+                                    'type': EXAMPLE_RESOURCE_4['type'],
+                                    'id': EXAMPLE_RESOURCE_4['id']
                                 }
                             ]
                         }
@@ -109,7 +122,8 @@ class TestAssertionHelper:
                 },
             'included': [
                 EXAMPLE_USER,
-                EXAMPLE_RESOURCE_2
+                EXAMPLE_RESOURCE_2,
+                EXAMPLE_RESOURCE_4
             ]
         }
 
@@ -359,6 +373,25 @@ class TestAssertionHelper:
             pk=EXAMPLE_USER['id'],
         )})
 
+    def test_vnd_relationships_match_list(self, json_asserter, vnd_single):
+        response = self.build_response(vnd_single)
+
+        json_asserter.HTTP_200(response, relationships={
+            'owner': json_asserter.EntityRef(
+                resource=EXAMPLE_USER['type'],
+                pk=EXAMPLE_USER['id'],
+            ),
+            'children': [
+                json_asserter.EntityRef(
+                    resource=EXAMPLE_RESOURCE_2['type'],
+                    pk=EXAMPLE_RESOURCE_2['id'],
+                ),
+                json_asserter.EntityRef(
+                    resource=EXAMPLE_RESOURCE_4['type'],
+                    pk=EXAMPLE_RESOURCE_4['id'],
+                ),
+            ]})
+
     def test_vnd_relationships_not_match(self, json_asserter, vnd_single):
         response = self.build_response(vnd_single)
 
@@ -368,6 +401,23 @@ class TestAssertionHelper:
                 pk=EXAMPLE_RESOURCE['id'],
             )})
         assert f'EntityRef resource type `{EXAMPLE_RESOURCE["type"]}` does not match' in str(err.value)
+
+    def test_vnd_relationships_not_match_in_list(self, json_asserter, vnd_single):
+        response = self.build_response(vnd_single)
+
+        relationship = json_asserter.EntityRef(resource=EXAMPLE_RESOURCE_3["type"],
+                                               pk=EXAMPLE_RESOURCE_3["id"],
+                                               attributes={})
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, relationships={'children': [
+                json_asserter.EntityRef(
+                    resource=EXAMPLE_RESOURCE_2['type'],
+                    pk=EXAMPLE_RESOURCE_2['id'],
+                ),
+                relationship,
+            ]})
+        assert f'{relationship} NOT IN ' in str(err.value)
 
     def test_vnd_included_should_be_entity_ref(self, json_asserter, vnd_single):
         response = self.build_response(vnd_single)

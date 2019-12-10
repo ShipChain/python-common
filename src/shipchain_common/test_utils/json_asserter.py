@@ -107,27 +107,33 @@ def _vnd_assert_relationships(response_data, relationships):
         relationships = [relationships]
 
     for relationship in relationships:
-        for relationship_name, relationship_ref in relationship.items():
+        for relationship_name, relationship_refs in relationship.items():
 
             assert relationship_name in response_relationships, \
                 f'Relationship `{relationship_name}` not in {response_relationships}'
-            assert isinstance(relationship_ref, EntityReferenceClass), \
-                f'asserted relationship is not an EntityRef {relationship_ref}'
 
-            assert 'data' in response_relationships[relationship_name], \
-                f'Data missing in {relationship_name} relationship : {response_relationships[relationship_name]}'
+            if not isinstance(relationship_refs, list):
+                relationship_refs = [relationship_refs]
 
-            if isinstance(response_relationships[relationship_name]['data'], list):
-                _vnd_assert_entity_ref_in_list(response_relationships[relationship_name]['data'], relationship_ref,
-                                               skip_attributes_property=True)
+            for relationship_ref in relationship_refs:
 
-            else:
-                if relationship_ref.resource:
-                    assert response_relationships[relationship_name]['data']['type'] == relationship_ref.resource, \
-                        f'EntityRef resource type `{relationship_ref.resource}` does not match {response_relationships}'
-                if relationship_ref.pk:
-                    assert response_relationships[relationship_name]['data']['id'] == relationship_ref.pk, \
-                        f'EntityRef ID `{relationship_ref.pk}` does not match {response_relationships}'
+                assert isinstance(relationship_ref, EntityReferenceClass), \
+                    f'asserted relationship is not an EntityRef {relationship_ref}'
+
+                assert 'data' in response_relationships[relationship_name], \
+                    f'Data missing in {relationship_name} relationship : {response_relationships[relationship_name]}'
+
+                if isinstance(response_relationships[relationship_name]['data'], list):
+                    _vnd_assert_entity_ref_in_list(response_relationships[relationship_name]['data'], relationship_ref,
+                                                   skip_attributes_property=True)
+
+                else:
+                    if relationship_ref.resource:
+                        assert response_relationships[relationship_name]['data']['type'] == relationship_ref.resource, \
+                            f'EntityRef resource type `{relationship_ref.resource}` does not match {response_relationships}'
+                    if relationship_ref.pk:
+                        assert response_relationships[relationship_name]['data']['id'] == relationship_ref.pk, \
+                            f'EntityRef ID `{relationship_ref.pk}` does not match {response_relationships}'
 
 
 def _vnd_assert_include(response, included):
