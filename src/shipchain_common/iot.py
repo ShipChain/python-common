@@ -25,6 +25,7 @@ from rest_framework import status
 from influxdb_metrics.loader import log_metric, TimingMetric
 
 from .exceptions import AWSIoTError
+from .utils import DecimalEncoder
 
 
 LOG = logging.getLogger('python-common')
@@ -54,7 +55,7 @@ class AWSIoTClient:
         generic_endpoint = AWSIoTClient._get_generic_endpoint_for_metric(http_method, endpoint)
 
         if payload:
-            payload = json.dumps(payload)
+            payload = json.dumps(payload, cls=DecimalEncoder)
 
         url = f'https://{settings.IOT_AWS_HOST}/{settings.IOT_GATEWAY_STAGE}/{endpoint}'
 
