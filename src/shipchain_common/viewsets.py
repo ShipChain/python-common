@@ -156,6 +156,7 @@ class ConfigurableGenericViewSet(GenericViewSet):
     """
     configuration = None
     action_user_permissions = None
+    default_required_user_permissions = None
 
     def __init__(self, **kwargs):
         super(ConfigurableGenericViewSet, self).__init__(**kwargs)
@@ -179,6 +180,12 @@ class ConfigurableGenericViewSet(GenericViewSet):
                 if self.action_user_permissions is None:
                     self.action_user_permissions = {}
                 self.action_user_permissions[action] = config.required_user_permissions
+
+        if self.default_required_user_permissions:
+            if self.action_user_permissions is None:
+                self.action_user_permissions = {}
+            if self.action not in self.action_user_permissions:
+                self.action_user_permissions[self.action] = self.default_required_user_permissions
 
     def get_configuration(self):
         """

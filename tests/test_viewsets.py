@@ -468,3 +468,48 @@ class TestConfigurableGenericViewSet:
         assert viewset.get_permissions() == [FakePermission2]
         assert 'update' not in viewset.configuration
         assert 'update' not in viewset.action_user_permissions
+
+    def test_configurable_generic_view_set_default_user_perms(self, viewset):
+        viewset.default_required_user_permissions = ['feature.default_permission']
+        viewset.configuration = {
+            'list': ActionConfiguration(
+                response_serializer=ListResponseSerializer,
+                permission_classes=[FakePermission, FakePermission2],
+                required_user_permissions=['feature.permission', 'feature.permission2'],
+            ),
+            'custom_action': ActionConfiguration(
+                permission_classes=[FakePermission, FakePermission3],
+            ),
+        }
+
+        viewset.action = 'list'
+        assert viewset.get_serializer().__class__ == DefaultSerializer
+        assert viewset.get_serializer(serialization_type=SerializationType.RESPONSE).__class__ == ListResponseSerializer
+        assert viewset.get_serializer_class() == DefaultSerializer
+        assert viewset.get_serializer_class(SerializationType.RESPONSE) == ListResponseSerializer
+        assert viewset.get_permissions() == [FakePermission, FakePermission2]
+        assert viewset.configuration['list'].serializer is None
+        assert viewset.action_user_permissions['list'] == ['feature.permission', 'feature.permission2']
+
+        viewset.action = 'custom_action'
+        assert viewset.get_serializer().__class__ == DefaultSerializer
+        assert viewset.get_serializer(serialization_type=SerializationType.RESPONSE).__class__ == DefaultSerializer
+        assert viewset.get_serializer_class() == DefaultSerializer
+        assert viewset.get_serializer_class(SerializationType.RESPONSE) == DefaultSerializer
+        assert viewset.get_permissions() == [FakePermission, FakePermission3]
+        assert viewset.configuration['custom_action'].serializer is None
+        assert 'custom_action' in viewset.action_user_permissions
+        assert viewset.action_user_permissions['custom_action'] == ['feature.default_permission']
+
+        viewset.action = 'update'
+        assert viewset.get_serializer().__class__ == DefaultSerializer
+        assert viewset.get_serializer(serialization_type=SerializationType.RESPONSE).__class__ == DefaultSerializer
+        assert viewset.get_serializer_class() == DefaultSerializer
+        assert viewset.get_serializer_class(SerializationType.RESPONSE) == DefaultSerializer
+        assert viewset.get_permissions() == [FakePermission2]
+        assert 'update' not in viewset.configuration
+        assert 'update' in viewset.action_user_permissions
+        assert viewset.action_user_permissions['update'] == ['feature.default_permission']
+
+        viewset.action = 'list'
+        assert viewset.action_user_permissions['list'] == ['feature.permission', 'feature.permission2']
