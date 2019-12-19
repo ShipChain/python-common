@@ -23,6 +23,7 @@ class JsonApiPagePagination(JsonApiPageNumberPagination):
     with page query param: 'page[number]' that needs to be overridden here with proper value
     """
     page_query_param = 'page'
+    page_size_query_param = 'page_size'
 
 
 class CustomResponsePagination(JsonApiPagePagination):
