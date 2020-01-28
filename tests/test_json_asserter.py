@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from rest_framework import status
-from shipchain_common.test_utils import AssertionHelper
+from shipchain_common.test_utils import AssertionHelper, JsonAsserterMixin
 
 EXAMPLE_PLAIN = {
     'id': '07b374c3-ed9b-4811-901a-d0c5d746f16a',
@@ -837,3 +837,8 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=invalid_attributes)
         assert f'{invalid_attributes} NOT IN ' in str(err.value)
+
+
+class TestJsonAsserterMixin(JsonAsserterMixin):
+    def test_has_asserter(self):
+        assert hasattr(self, 'json_asserter')
