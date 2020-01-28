@@ -77,6 +77,122 @@ EXAMPLE_RESOURCE_4 = {
 }
 
 
+@pytest.fixture
+def vnd_single():
+    return {
+        'data': {
+            'type': EXAMPLE_RESOURCE['type'],
+            'id': EXAMPLE_RESOURCE['id'],
+            'attributes': EXAMPLE_RESOURCE['attributes'],
+            'relationships': {
+                'owner': {
+                    'data': {
+                        'type': EXAMPLE_USER['type'],
+                        'id': EXAMPLE_USER['id']
+                    }
+                },
+                'children': {
+                    'meta': {
+                        'count': 2
+                    },
+                    'data': [
+                        {
+                            'type': EXAMPLE_RESOURCE_2['type'],
+                            'id': EXAMPLE_RESOURCE_2['id']
+                        },
+                        {
+                            'type': EXAMPLE_RESOURCE_4['type'],
+                            'id': EXAMPLE_RESOURCE_4['id']
+                        }
+                    ]
+                }
+            }
+        },
+        'included': [
+            EXAMPLE_USER,
+            EXAMPLE_RESOURCE_2,
+            EXAMPLE_RESOURCE_4
+        ]
+    }
+
+
+@pytest.fixture
+def vnd_list():
+    return {
+        'data': [
+            {
+                'type': EXAMPLE_RESOURCE['type'],
+                'id': EXAMPLE_RESOURCE['id'],
+                'attributes': EXAMPLE_RESOURCE['attributes'],
+                'relationships': {
+                    'owner': {
+                        'data': {
+                            'type': EXAMPLE_USER['type'],
+                            'id': EXAMPLE_USER['id']
+                        }
+                    },
+                    'children': {
+                        'meta': {
+                            'count': 1
+                        },
+                        'data': [
+                            {
+                                'type': EXAMPLE_RESOURCE_2['type'],
+                                'id': EXAMPLE_RESOURCE_2['id']
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                'type': EXAMPLE_RESOURCE_3['type'],
+                'id': EXAMPLE_RESOURCE_3['id'],
+                'attributes': EXAMPLE_RESOURCE_3['attributes'],
+                'relationships': {
+                    'owner': {
+                        'data': {
+                            'type': EXAMPLE_USER['type'],
+                            'id': EXAMPLE_USER['id']
+                        }
+                    },
+                    'children': {
+                        'meta': {
+                            'count': 1
+                        },
+                        'data': [
+                            {
+                                'type': EXAMPLE_RESOURCE_2['type'],
+                                'id': EXAMPLE_RESOURCE_2['id']
+                            }
+                        ]
+                    }
+                }
+            },
+        ],
+        'included': [
+            EXAMPLE_USER,
+            EXAMPLE_RESOURCE_2
+        ]
+    }
+
+
+@pytest.fixture
+def vnd_error():
+    return {
+        'errors': [
+            {
+                'detail': ''
+            }
+        ]
+    }
+
+
+@pytest.fixture
+def vnd_error_400(vnd_error):
+    vnd_error['errors'][0]['detail'] = 'generic 400 error'
+    return vnd_error
+
+
 class TestAssertionHelper:
 
     @pytest.fixture(scope='session')
@@ -88,118 +204,6 @@ class TestAssertionHelper:
         def _build_response(data, status_code=status.HTTP_200_OK):
             return Mock(status_code=status_code, json=lambda: data)
         self.build_response = _build_response
-
-    @pytest.fixture
-    def vnd_single(self):
-        return {
-            'data': {
-                    'type': EXAMPLE_RESOURCE['type'],
-                    'id': EXAMPLE_RESOURCE['id'],
-                    'attributes': EXAMPLE_RESOURCE['attributes'],
-                    'relationships': {
-                        'owner': {
-                            'data': {
-                                'type': EXAMPLE_USER['type'],
-                                'id': EXAMPLE_USER['id']
-                            }
-                        },
-                        'children': {
-                            'meta': {
-                                'count': 2
-                            },
-                            'data': [
-                                {
-                                    'type': EXAMPLE_RESOURCE_2['type'],
-                                    'id': EXAMPLE_RESOURCE_2['id']
-                                },
-                                {
-                                    'type': EXAMPLE_RESOURCE_4['type'],
-                                    'id': EXAMPLE_RESOURCE_4['id']
-                                }
-                            ]
-                        }
-                    }
-                },
-            'included': [
-                EXAMPLE_USER,
-                EXAMPLE_RESOURCE_2,
-                EXAMPLE_RESOURCE_4
-            ]
-        }
-
-    @pytest.fixture
-    def vnd_list(self):
-        return {
-            'data': [
-                {
-                    'type': EXAMPLE_RESOURCE['type'],
-                    'id': EXAMPLE_RESOURCE['id'],
-                    'attributes': EXAMPLE_RESOURCE['attributes'],
-                    'relationships': {
-                        'owner': {
-                            'data': {
-                                'type': EXAMPLE_USER['type'],
-                                'id': EXAMPLE_USER['id']
-                            }
-                        },
-                        'children': {
-                            'meta': {
-                                'count': 1
-                            },
-                            'data': [
-                                {
-                                    'type': EXAMPLE_RESOURCE_2['type'],
-                                    'id': EXAMPLE_RESOURCE_2['id']
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    'type': EXAMPLE_RESOURCE_3['type'],
-                    'id': EXAMPLE_RESOURCE_3['id'],
-                    'attributes': EXAMPLE_RESOURCE_3['attributes'],
-                    'relationships': {
-                        'owner': {
-                            'data': {
-                                'type': EXAMPLE_USER['type'],
-                                'id': EXAMPLE_USER['id']
-                            }
-                        },
-                        'children': {
-                            'meta': {
-                                'count': 1
-                            },
-                            'data': [
-                                {
-                                    'type': EXAMPLE_RESOURCE_2['type'],
-                                    'id': EXAMPLE_RESOURCE_2['id']
-                                }
-                            ]
-                        }
-                    }
-                },
-            ],
-            'included': [
-                EXAMPLE_USER,
-                EXAMPLE_RESOURCE_2
-            ]
-        }
-
-    @pytest.fixture
-    def vnd_error(self):
-        return {
-            'errors': [
-                {
-                    'detail': ''
-                }
-            ]
-        }
-
-    @pytest.fixture
-    def vnd_error_400(self, vnd_error):
-        vnd_error['errors'][0]['detail'] = 'generic 400 error'
-        return vnd_error
 
     @pytest.fixture
     def vnd_error_401(self, vnd_error):
@@ -842,3 +846,18 @@ class TestAssertionHelper:
 class TestJsonAsserterMixin(JsonAsserterMixin):
     def test_has_asserter(self):
         assert hasattr(self, 'json_asserter')
+
+    @pytest.fixture(autouse=True)
+    def make_build_response(self):
+        def _build_response(data, status_code=status.HTTP_200_OK):
+            return Mock(status_code=status_code, json=lambda: data)
+        self.build_response = _build_response
+
+    def test_status_200(self, vnd_single, vnd_error_400):
+        response = self.build_response(vnd_single)
+        self.json_asserter.HTTP_200(response)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(vnd_error_400, status_code=status.HTTP_400_BAD_REQUEST)
+            self.json_asserter.HTTP_200(response)
+        assert 'status_code 400 != 200' in str(err.value)
