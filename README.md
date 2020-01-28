@@ -184,3 +184,9 @@ json_asserter.HTTP_200(response,
                         "is_active": False
                     }])
 ```
+
+#### Mixin Usage
+
+If there is a class where every test may wish to use the `json_asserter`, than it may be easier to use to the `JsonAsserterMixin` found in `shipchain_common.test_utils`.
+This will automatically add the `json_asserter` and set it as a class attribute before the tests are run.
+This allows you to just call `self.json_asserter`, allowing for cleaner unit tests imports. 
