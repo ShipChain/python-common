@@ -17,7 +17,8 @@ limitations under the License.
 
 from .json_asserter import \
     json_asserter, \
-    AssertionHelper
+    AssertionHelper, \
+    JsonAsserterMixin
 
 from .helpers import\
     create_form_content, \

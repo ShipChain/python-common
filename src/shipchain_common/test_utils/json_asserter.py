@@ -341,3 +341,9 @@ class AssertionHelper:
 @pytest.fixture(scope='session')
 def json_asserter():
     return AssertionHelper
+
+
+class JsonAsserterMixin:
+    @pytest.fixture(autouse=True)
+    def set_json_asserter(self, json_asserter):
+        self.json_asserter = json_asserter
