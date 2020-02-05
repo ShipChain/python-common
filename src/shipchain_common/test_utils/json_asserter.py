@@ -33,7 +33,7 @@ class EntityReferenceClass:
                f'attributes: {self.attributes}; relationships: {self.relationships}'
 
 
-def response_has_error(response, error):
+def response_has_error(response, error, pointer=None):
     if error is not None:
         response_json = response.json()
         assert 'errors' in response_json, f'Malformed error response: {response_json}'
@@ -44,6 +44,9 @@ def response_has_error(response, error):
         for single_error in response_json['errors']:
             if error in single_error['detail']:
                 error_found = True
+                if pointer:
+                    found_pointer = single_error['source']['pointer']
+                    assert pointer in found_pointer, f'Error `{pointer}` not found in {found_pointer}'
 
         if not error_found:
             assert False, f'Error `{error}` not found in {response_json}'
@@ -301,10 +304,10 @@ def assert_204(response):
     assert response.status_code == status.HTTP_204_NO_CONTENT, f'status_code {response.status_code} != 204'
 
 
-def assert_400(response, error=None):
+def assert_400(response, error=None, pointer=None):
     assert response is not None
     assert response.status_code == status.HTTP_400_BAD_REQUEST, f'status_code {response.status_code} != 400'
-    response_has_error(response, error)
+    response_has_error(response, error, pointer)
 
 
 def assert_401(response, error='Authentication credentials were not provided'):
@@ -319,10 +322,10 @@ def assert_403(response, error='You do not have permission to perform this actio
     response_has_error(response, error)
 
 
-def assert_404(response, error='Not found'):
+def assert_404(response, error='Not found', pointer=None):
     assert response is not None
     assert response.status_code == status.HTTP_404_NOT_FOUND, f'status_code {response.status_code} != 404'
-    response_has_error(response, error)
+    response_has_error(response, error, pointer)
 
 
 class AssertionHelper:

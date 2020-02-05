@@ -190,6 +190,9 @@ def vnd_error():
 @pytest.fixture
 def vnd_error_400(vnd_error):
     vnd_error['errors'][0]['detail'] = 'generic 400 error'
+    vnd_error['errors'][0]['source'] = {
+        'pointer': ''
+    }
     return vnd_error
 
 
@@ -256,10 +259,16 @@ class TestAssertionHelper:
             json_asserter.HTTP_400(response)
         assert 'status_code 200 != 400' in str(err.value)
 
-    def test_status_400_custom_message(self, json_asserter, vnd_single, vnd_error_400):
+    def test_status_400_custom_message(self, json_asserter, vnd_error_400):
         vnd_error_400['errors'][0]['detail'] = 'custom error message'
         response = self.build_response(vnd_error_400, status_code=status.HTTP_400_BAD_REQUEST)
         json_asserter.HTTP_400(response, error='custom error message')
+
+    def test_status_400_custom_pointer(self, json_asserter, vnd_error_400):
+        vnd_error_400['errors'][0]['detail'] = 'custom error message'
+        vnd_error_400['errors'][0]['source']['pointer'] = 'pointer'
+        response = self.build_response(vnd_error_400, status_code=status.HTTP_400_BAD_REQUEST)
+        json_asserter.HTTP_400(response, error='custom error message', pointer='pointer')
 
     def test_status_401(self, json_asserter, vnd_single, vnd_error_401):
         response = self.build_response(vnd_error_401, status_code=status.HTTP_401_UNAUTHORIZED)
@@ -293,6 +302,37 @@ class TestAssertionHelper:
 
         with pytest.raises(AssertionError) as err:
             json_asserter.HTTP_404(response, error='Not the correct error')
+        assert f'Error `Not the correct error` not found in' in str(err.value)
+
+    def test_status_400_wrong_pointer(self, json_asserter, vnd_error_400):
+        vnd_error_400['errors'][0]['detail'] = 'custom error message'
+        vnd_error_400['errors'][0]['source']['pointer'] = 'pointer'
+        response = self.build_response(vnd_error_400, status_code=status.HTTP_400_BAD_REQUEST)
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_400(response, error='custom error message', pointer='Not the correct pointer')
+        assert f'Error `Not the correct pointer` not found in' in str(err.value)
+
+    def test_status_404_wrong_pointer(self, json_asserter, vnd_error):
+        vnd_error['errors'][0]['detail'] = 'Not found'
+        vnd_error['errors'][0]['source'] = {
+            'pointer': 'correct pointer'
+        }
+        response = self.build_response(vnd_error, status_code=status.HTTP_404_NOT_FOUND)
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_404(response, pointer='Not the correct pointer')
+        assert f'Error `Not the correct pointer` not found in' in str(err.value)
+
+    def test_status_pointer_requires_correct_error(self, json_asserter, vnd_error):
+        vnd_error['errors'][0]['detail'] = 'Not found'
+        vnd_error['errors'][0]['source'] = {
+            'pointer': 'correct pointer'
+        }
+        response = self.build_response(vnd_error, status_code=status.HTTP_404_NOT_FOUND)
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_404(response, error='Not the correct error', pointer='Not the correct pointer')
         assert f'Error `Not the correct error` not found in' in str(err.value)
 
     def test_status_in_second_error(self, json_asserter, vnd_error_404):
