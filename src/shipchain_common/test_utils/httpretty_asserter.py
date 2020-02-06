@@ -71,9 +71,6 @@ class HTTPrettyAsserter(HTTPretty):
                                                        f' made asserted {len(asserted_calls)}. Calls: {calls_list}'
         for index, _ in enumerate(calls_list):
             cls._assert_call_in_list(calls_list[index], asserted_calls[index])
-        entries_length = len(cls._entries)
-        cls._entries.clear()
-        assert len(asserted_calls) == entries_length, f'Error: more calls were mocked than were made: {entries_length}'
 
     @classmethod
     def _assert_call_in_list(cls, call, assertion):
