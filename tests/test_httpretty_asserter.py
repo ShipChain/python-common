@@ -5,8 +5,8 @@ from rest_framework import status
 import requests
 from datetime import datetime
 from copy import deepcopy
-
-from src.shipchain_common.test_utils import HTTPrettyAsserter
+from urllib.parse import parse_qs
+from src.shipchain_common.test_utils import HTTPrettyAsserter, parse_dict
 
 CURRENT_TIME = datetime.now()
 
@@ -19,8 +19,8 @@ def modified_http_pretty():
 
 
 @pytest.fixture
-def query_string(query_dict):
-    return f'?query_param_1={1}&query_param_2={2}&query_param_bool={False}&datetime={CURRENT_TIME}'
+def query_string():
+    return f'query_param_1={1}&query_param_2={2}&query_param_bool={False}&datetime={CURRENT_TIME}'
 
 
 @pytest.fixture
@@ -29,29 +29,17 @@ def modified_query_string(query_string):
 
 
 @pytest.fixture
-def query_dict():
-    return {
-        'query_param_1': 1,
-        'query_param_2': 2,
-        'query_param_bool': False,
-        'datetime': str(CURRENT_TIME)
-    }
+def query_dict(query_string):
+    return parse_dict(parse_qs(query_string))
 
 
 @pytest.fixture
-def modified_query_dict():
-    return {
-        'query_param_1': 1,
-        'query_param_2': 2,
-        'query_param_bool': False,
-        'datetime': str(CURRENT_TIME),
-        'query_param_3': 3,
-    }
+def modified_query_dict(modified_query_string):
+    return parse_dict(parse_qs(modified_query_string))
 
 
 @pytest.fixture
 def http_pretty_list_mocking(modified_http_pretty):
-    modified_http_pretty.register_uri(modified_http_pretty.POST, 'http://google.com/path', status=status.HTTP_200_OK)
     modified_http_pretty.register_uri(modified_http_pretty.POST, 'http://google.com/path', status=status.HTTP_200_OK)
     modified_http_pretty.register_uri(modified_http_pretty.POST, 'http://google.com/other_path',
                                       status=status.HTTP_200_OK)
@@ -175,7 +163,7 @@ def dict_assertions(query_dict, successful_body):
 class TestHttprettyList:
     def test_unsuccessful_empty_check(self, http_pretty_list_mocking, query_string, successful_json_body,
                                       single_assertions):
-        requests.post('http://google.com/path' + query_string, data=successful_json_body,
+        requests.post('http://google.com/path?' + query_string, data=successful_json_body,
                       headers={'content-type': 'application/json'})
         requests.post('http://google.com/path')
 
@@ -186,16 +174,16 @@ class TestHttprettyList:
 
     def test_successful_mocking(self, http_pretty_list_mocking, query_string, successful_assertions, successful_body,
                                 successful_json_body, modified_query_string, successful_urlencoded_body):
-        requests.post('http://google.com/path' + query_string, data=successful_json_body,
+        requests.post('http://google.com/path?' + query_string, data=successful_json_body,
                       headers={'content-type': 'application/json'})
-        requests.post('http://google.com/path' + modified_query_string, data='')
+        requests.post('http://google.com/path?' + modified_query_string, data='')
         requests.post('http://bing.com/bing_path', data=successful_urlencoded_body,
                       headers={'content-type': 'application/x-www-form-urlencoded'})
         http_pretty_list_mocking.assert_calls(successful_assertions)
 
     def test_unsuccessful_query_check(self, http_pretty_list_mocking, modified_query_string, failing_query_assertions,
                                       query_dict, modified_query_dict, successful_body):
-        requests.post('http://google.com/path' + modified_query_string, data='')
+        requests.post('http://google.com/path?' + modified_query_string, data='')
         with pytest.raises(AssertionError) as err:
             http_pretty_list_mocking.assert_calls(failing_query_assertions)
         assert f'Error: query mismatch, desired `{query_dict}` returned `{modified_query_dict}`.' in str(err.value)
