@@ -299,6 +299,21 @@ def assert_201(response, vnd=True, entity_refs=None, included=None, is_list=Fals
                       entity_refs=entity_refs)
 
 
+def assert_202(response, vnd=True, entity_refs=None, included=None, is_list=False,
+               resource=None, pk=None, attributes=None, relationships=None):
+    assert response is not None
+    assert response.status_code == status.HTTP_202_ACCEPTED, f'status_code {response.status_code} != 202'
+    response_has_data(response,
+                      attributes=attributes,
+                      relationships=relationships,
+                      included=included,
+                      is_list=is_list,
+                      vnd=vnd,
+                      resource=resource,
+                      pk=pk,
+                      entity_refs=entity_refs)
+
+
 def assert_204(response):
     assert response is not None
     assert response.status_code == status.HTTP_204_NO_CONTENT, f'status_code {response.status_code} != 204'
@@ -333,6 +348,7 @@ class AssertionHelper:
 
     HTTP_200 = assert_200
     HTTP_201 = assert_201
+    HTTP_202 = assert_202
     HTTP_204 = assert_204
 
     HTTP_400 = assert_400
