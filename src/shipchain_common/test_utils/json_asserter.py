@@ -343,6 +343,18 @@ def assert_404(response, error='Not found', pointer=None):
     response_has_error(response, error, pointer)
 
 
+def assert_500(response, error='A server error occurred.', pointer=None):
+    assert response is not None
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR, f'status_code {response.status_code} != 500'
+    response_has_error(response, error, pointer)
+
+
+def assert_503(response, error='Service temporarily unavailable, try again later', pointer=None):
+    assert response is not None
+    assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE, f'status_code {response.status_code} != 503'
+    response_has_error(response, error, pointer)
+
+
 class AssertionHelper:
     EntityRef = EntityReferenceClass
 
@@ -355,6 +367,9 @@ class AssertionHelper:
     HTTP_401 = assert_401
     HTTP_403 = assert_403
     HTTP_404 = assert_404
+
+    HTTP_500 = assert_500
+    HTTP_503 = assert_503
 
 
 @pytest.fixture(scope='session')

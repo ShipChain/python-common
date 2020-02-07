@@ -241,6 +241,15 @@ class TestAssertionHelper:
             json_asserter.HTTP_201(response)
         assert 'status_code 400 != 201' in str(err.value)
 
+    def test_status_202(self, json_asserter, vnd_single, vnd_error_400):
+        response = self.build_response(vnd_single, status_code=status.HTTP_202_ACCEPTED)
+        json_asserter.HTTP_202(response)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(vnd_error_400, status_code=status.HTTP_400_BAD_REQUEST)
+            json_asserter.HTTP_202(response)
+        assert 'status_code 400 != 202' in str(err.value)
+
     def test_status_204(self, json_asserter, vnd_single, vnd_error_400):
         response = self.build_response(vnd_single, status_code=status.HTTP_204_NO_CONTENT)
         json_asserter.HTTP_204(response)
@@ -296,6 +305,36 @@ class TestAssertionHelper:
             response = self.build_response(vnd_single)
             json_asserter.HTTP_404(response)
         assert 'status_code 200 != 404' in str(err.value)
+
+    def test_status_500(self, json_asserter, vnd_single, vnd_error):
+        vnd_error['errors'][0]['detail'] = 'A server error occurred.'
+        response = self.build_response(vnd_error, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        json_asserter.HTTP_500(response)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(vnd_single)
+            json_asserter.HTTP_500(response)
+        assert 'status_code 200 != 500' in str(err.value)
+
+    def test_status_500_custom_message(self, json_asserter, vnd_error):
+        vnd_error['errors'][0]['detail'] = 'custom error message'
+        response = self.build_response(vnd_error, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        json_asserter.HTTP_500(response, error='custom error message')
+
+    def test_status_503(self, json_asserter, vnd_single, vnd_error):
+        vnd_error['errors'][0]['detail'] = 'Service temporarily unavailable, try again later'
+        response = self.build_response(vnd_error, status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+        json_asserter.HTTP_503(response)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(vnd_single)
+            json_asserter.HTTP_503(response)
+        assert 'status_code 200 != 503' in str(err.value)
+
+    def test_status_503_custom_message(self, json_asserter, vnd_error):
+        vnd_error['errors'][0]['detail'] = 'custom error message'
+        response = self.build_response(vnd_error, status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+        json_asserter.HTTP_503(response, error='custom error message')
 
     def test_status_wrong_message(self, json_asserter, vnd_error_404):
         response = self.build_response(vnd_error_404, status_code=status.HTTP_404_NOT_FOUND)
