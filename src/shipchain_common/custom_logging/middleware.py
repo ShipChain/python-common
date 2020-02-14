@@ -18,7 +18,7 @@ import threading
 
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
-from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.exceptions import InvalidToken, AuthenticationFailed
 
 CURRENT_THREAD = threading.current_thread()
 
@@ -26,15 +26,16 @@ CURRENT_THREAD = threading.current_thread()
 class UserOrganizationMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
-        # We put this import here to avoid cyclical imports during app init
+        # We put this import here to avoid circular imports during app init
         from ..authentication import PASSIVE_JWT_AUTHENTICATION, passive_credentials_auth
 
         user_id, org_id = None, None
         header = PASSIVE_JWT_AUTHENTICATION.get_header(request)
 
         if header:
-            raw_token = PASSIVE_JWT_AUTHENTICATION.get_raw_token(header)
             try:
+                raw_token = PASSIVE_JWT_AUTHENTICATION.get_raw_token(header)
+
                 if settings.ENVIRONMENT.lower() in ('int', 'local'):
                     from rest_framework_simplejwt.tokens import UntypedToken
                     # We use UntypedToken with verify False here to avoid
@@ -45,7 +46,7 @@ class UserOrganizationMiddleware(MiddlewareMixin):
 
                 org_id = token_user.token.payload.get('organization_id')
                 user_id = token_user.id
-            except InvalidToken:
+            except (InvalidToken, AuthenticationFailed):
                 # Provided token is expired or invalid
                 pass
 
