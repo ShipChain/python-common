@@ -41,7 +41,6 @@ from .mocked_rpc_responses import \
     valid_eth_amount
 
 from .httpretty_asserter import \
-    HTTPrettyAsserter, \
-    parse_dict
+    HTTPrettyAsserter
 
 from ..utils import validate_uuid4  # Imported for backwards compatibility usage of `from shipchain_common.test_utils`

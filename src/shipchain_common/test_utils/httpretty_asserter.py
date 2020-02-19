@@ -2,38 +2,8 @@ import json
 
 from httpretty import HTTPretty
 
-
-def _parse_item(item):
-    if item in ['False', 'false']:
-        return False
-    if item in ['True', 'true']:
-        return True
-    try:
-        parsed = json.loads(item)
-    except ValueError:
-        parsed = item
-    return parsed
-
-
-def _parse_list(to_parse_list):
-    parsed_list = []
-    for item in to_parse_list:
-        if isinstance(item, list):
-            parsed_list.append(_parse_list(item))
-        else:
-            parsed_list.append(_parse_item(item))
-    return parsed_list
-
-
-def parse_dict(body):
-    parsed_body = {}
-    for key in body:
-        if isinstance(body[key], list):
-            if len(body[key]) > 1:
-                parsed_body[key] = _parse_list(body[key])
-            else:
-                parsed_body[key] = _parse_item(body[key][0])
-    return parsed_body
+from urllib.parse import urlparse
+from ..utils import parse_urlencoded_data
 
 
 class HTTPrettyAsserter(HTTPretty):
@@ -47,15 +17,20 @@ class HTTPrettyAsserter(HTTPretty):
                 # Setting the current call to None and iterating through this way ensures that only calls from the
                 # individual test are set in the call_list.
                 continue
-            parsed_path = call.path.split("?")[0]
-            if call.headers.get('content-type', '') not in ('application/json', 'text/json'):
-                parsed_body = parse_dict(call.parsed_body)
+
+            url = urlparse(call.path)
+            if call.headers.get('content-type', '') in ('application/json', 'text/json'):
+                try:
+                    body = json.loads(call.body)
+                except json.JSONDecodeError:
+                    body = None
             else:
-                parsed_body = call.parsed_body
+                body = parse_urlencoded_data(call.body.decode())
+
             calls_list.append({
-                'path': parsed_path,
-                'query': parse_dict(call.querystring),
-                'body': parsed_body,
+                'path': url.path,
+                'query': parse_urlencoded_data(url.query),
+                'body': body,
                 'host': call.headers.get('host', '')
             })
             cls.latest_requests[index] = None
@@ -81,8 +56,8 @@ class HTTPrettyAsserter(HTTPretty):
         assert call['host'] in assertion["host"],\
             f'Error: host mismatch, desired `{assertion["host"]}` returned `{call["host"]}`.'
         if 'body' in assertion:
-            assert call['body'] == assertion['body'],\
+            assert assertion['body'] == call['body'], \
                 f'Error: body mismatch, desired `{assertion["body"]}` returned `{call["body"]}`.'
         if 'query' in assertion:
-            assert call['query'] == assertion["query"], \
+            assert assertion['query'] == call['query'], \
                 f'Error: query mismatch, desired `{assertion["query"]}` returned `{call["query"]}`.'

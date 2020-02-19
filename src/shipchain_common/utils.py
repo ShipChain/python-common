@@ -18,6 +18,7 @@ import decimal
 import json
 import re
 from uuid import UUID
+from urllib.parse import parse_qs
 
 from dateutil.parser import parse
 from django.db import models
@@ -64,6 +65,31 @@ def assertDeepAlmostEqual(test_case, expected, actual, *args, **kwargs):  # nope
             trace = ' -> '.join(reversed(exc.traces))
             exc = AssertionError("%s\nTRACE: %s" % (str(exc), trace))
         raise exc
+
+
+def _parse_value(item):
+    if str(item).lower() in ('true', 'false'):
+        # json.loads will parse lowercase booleans
+        item = str(item).lower()
+    try:
+        # We're not actually trying to parse JSON here, but json.loads is a good way to deserialize string values
+        parsed = json.loads(item)
+    except json.JSONDecodeError:
+        parsed = item
+    return parsed
+
+
+def parse_urlencoded_data(data):
+    # This function parses urlencoded data, unpacks single-list values, and ensures to parse datatypes for arrays
+    body = None
+    if data:
+        body = {}
+        for key, val in parse_qs(data).items():
+            if len(val) > 1:
+                body[key] = [_parse_value(el) for el in val]
+            else:
+                body[key] = _parse_value(val[0])
+    return body
 
 
 def build_auth_headers_from_request(request):

@@ -4,9 +4,8 @@ import pytest
 from rest_framework import status
 import requests
 from datetime import datetime
-from copy import deepcopy
-from urllib.parse import parse_qs
-from src.shipchain_common.test_utils import HTTPrettyAsserter, parse_dict
+from src.shipchain_common.utils import parse_urlencoded_data
+from src.shipchain_common.test_utils import HTTPrettyAsserter
 
 CURRENT_TIME = datetime.now()
 
@@ -29,13 +28,23 @@ def modified_query_string(query_string):
 
 
 @pytest.fixture
+def array_query_string(query_string):
+    return f'{query_string}&array=1&array=2'
+
+
+@pytest.fixture
 def query_dict(query_string):
-    return parse_dict(parse_qs(query_string))
+    return parse_urlencoded_data(query_string)
 
 
 @pytest.fixture
 def modified_query_dict(modified_query_string):
-    return parse_dict(parse_qs(modified_query_string))
+    return parse_urlencoded_data(modified_query_string)
+
+
+@pytest.fixture
+def array_query_dict(array_query_string):
+    return parse_urlencoded_data(array_query_string)
 
 
 @pytest.fixture
@@ -85,9 +94,8 @@ def successful_json_body():
 
 
 @pytest.fixture
-def successful_assertions(query_dict, successful_body, successful_urlencoded_body):
-    modified_query_dict = deepcopy(query_dict)
-    modified_query_dict['query_param_3'] = 3
+def successful_assertions(query_dict, modified_query_dict, array_query_dict, successful_body,
+                          successful_urlencoded_body):
     return [{
         'path': '/path',
         'body': successful_body,
@@ -95,8 +103,13 @@ def successful_assertions(query_dict, successful_body, successful_urlencoded_bod
         'host': 'google.com',
     }, {
         'path': '/path',
-        'body': {},
+        'body': None,
         'query': modified_query_dict,
+        'host': 'google.com',
+    }, {
+        'path': '/path',
+        'body': None,
+        'query': array_query_dict,
         'host': 'google.com',
     }, {
         'path': '/bing_path',
@@ -173,17 +186,19 @@ class TestHttprettyList:
         assert f"Difference in expected call count, 2 made asserted 1. Calls: " in str(err.value)
 
     def test_successful_mocking(self, http_pretty_list_mocking, query_string, successful_assertions, successful_body,
-                                successful_json_body, modified_query_string, successful_urlencoded_body):
+                                successful_json_body, array_query_string, modified_query_string,
+                                successful_urlencoded_body):
         requests.post('http://google.com/path?' + query_string, data=successful_json_body,
                       headers={'content-type': 'application/json'})
-        requests.post('http://google.com/path?' + modified_query_string, data='')
+        requests.post('http://google.com/path?' + modified_query_string)
+        requests.post('http://google.com/path?' + array_query_string)
         requests.post('http://bing.com/bing_path', data=successful_urlencoded_body,
                       headers={'content-type': 'application/x-www-form-urlencoded'})
         http_pretty_list_mocking.assert_calls(successful_assertions)
 
     def test_unsuccessful_query_check(self, http_pretty_list_mocking, modified_query_string, failing_query_assertions,
                                       query_dict, modified_query_dict, successful_body):
-        requests.post('http://google.com/path?' + modified_query_string, data='')
+        requests.post('http://google.com/path?' + modified_query_string)
         with pytest.raises(AssertionError) as err:
             http_pretty_list_mocking.assert_calls(failing_query_assertions)
         assert f'Error: query mismatch, desired `{query_dict}` returned `{modified_query_dict}`.' in str(err.value)
