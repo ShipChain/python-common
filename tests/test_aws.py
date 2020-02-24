@@ -68,7 +68,7 @@ def test_get(aws_url_client):
         }, code=404)
 
         with pytest.raises(AWSIoTError) as aws_error:
-            aws_url_client._get(metric_name='test_method')
+            aws_url_client._get('test_method')
             assert aws_error.status_code == 500
             assert 'Error from AWS Server' in aws_error.detail
 

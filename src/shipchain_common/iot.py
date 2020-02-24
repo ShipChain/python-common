@@ -41,14 +41,8 @@ class AWSIoTClient(AWSClient):
         self.session.headers = {'content-type': 'application/json'}
         self.session.auth = aws_auth
 
-    def _call(self, http_method, endpoint, metric_name=None, payload=None, params=None):
-        metric_name = AWSIoTClient._get_generic_endpoint_for_metric(http_method, endpoint)
-
-        super()._call(http_method, endpoint=endpoint, metric_name=metric_name, payload=payload, params=params)
-
-    @staticmethod
-    def _get_generic_endpoint_for_metric(http_method, endpoint):
+    def _get_generic_endpoint_for_metric(self, http_method, endpoint):
         generic_endpoint = re.sub(r'[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}',
                                   '<device_id>', endpoint, flags=re.IGNORECASE)
 
-        return f'{http_method}::{generic_endpoint}'
+        return f'iot::{http_method}::{generic_endpoint}'

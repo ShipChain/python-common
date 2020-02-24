@@ -27,7 +27,6 @@ from .exceptions import AWSIoTError
 from .utils import DecimalEncoder
 
 LOG = logging.getLogger('python-common')
-# pylint: disable=too-many-arguments
 
 
 class AWSClient:
@@ -39,7 +38,8 @@ class AWSClient:
 
     RESPONSE_200_METHODS = [METHOD_PUT, METHOD_GET, METHOD_DELETE]
 
-    def _call(self, http_method, endpoint, metric_name, payload=None, params=None):
+    def _call(self, http_method, endpoint, payload=None, params=None):
+        metric_name = self._get_generic_endpoint_for_metric(http_method, endpoint)
         self.url = f'{self.url}/{endpoint}'
         if payload:
             payload = json.dumps(payload, cls=DecimalEncoder)
@@ -80,20 +80,17 @@ class AWSClient:
 
         return response_json
 
-    def _post(self, endpoint=None, payload=None, query_params=None, metric_name=None):
-        return self._call(self.METHOD_POST, metric_name=metric_name, endpoint=endpoint, payload=payload,
-                          params=query_params)
+    def _post(self, endpoint=None, payload=None, query_params=None):
+        return self._call(self.METHOD_POST, endpoint, payload, params=query_params)
 
-    def _put(self, endpoint=None, payload=None, query_params=None, metric_name=None):
-        return self._call(self.METHOD_PUT, metric_name=metric_name, endpoint=endpoint, payload=payload,
-                          params=query_params)
+    def _put(self, endpoint=None, payload=None, query_params=None):
+        return self._call(self.METHOD_PUT, endpoint, payload, params=query_params)
 
-    def _get(self, endpoint=None, query_params=None, metric_name=None):
-        print(endpoint)
-        return self._call(self.METHOD_GET, metric_name=metric_name, endpoint=endpoint, params=query_params)
+    def _get(self, endpoint=None, query_params=None):
+        return self._call(self.METHOD_GET, endpoint, params=query_params)
 
-    def _delete(self, endpoint=None, query_params=None, metric_name=None):
-        return self._call(self.METHOD_DELETE, metric_name=metric_name, endpoint=endpoint, params=query_params)
+    def _delete(self, endpoint=None, query_params=None):
+        return self._call(self.METHOD_DELETE, endpoint, params=query_params)
 
     @staticmethod
     def _process_error_object(endpoint, response, response_json):
@@ -117,6 +114,10 @@ class AWSClient:
         LOG.error('aws_client(%s) error: %s', endpoint, message)
         raise AWSIoTError(f'Error in AWS IoT Request: [{error_code}] {message}')
 
+    def _get_generic_endpoint_for_metric(self, http_method, endpoint):
+        # This should be overwritten by each usage of this class for added clarity.
+        return f'{http_method}::{endpoint}'
+
 
 class URLShortenerClient(AWSClient):
 
@@ -131,3 +132,6 @@ class URLShortenerClient(AWSClient):
         self.session = requests.session()
         self.session.headers = {'content-type': 'application/json'}
         self.session.auth = aws_auth
+
+    def _get_generic_endpoint_for_metric(self, http_method, endpoint):
+        return f'urlshortener::{http_method}::{endpoint}'
