@@ -133,6 +133,7 @@ class GeoCoderResponse:
         self.ok = status
         self.xy = point
 
+
 # pylint: disable=too-many-arguments, redefined-builtin
 class JsonAPIClient(APIClient):
     def post(self, path, data=None, format='json', content_type=None, follow=False, **extra):
