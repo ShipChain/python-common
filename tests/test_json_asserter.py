@@ -1,7 +1,6 @@
 from unittest.mock import Mock
 
 import pytest
-
 from rest_framework import status
 from shipchain_common.test_utils import AssertionHelper, JsonAsserterMixin
 
@@ -196,6 +195,36 @@ def vnd_error_400(vnd_error):
     return vnd_error
 
 
+@pytest.fixture
+def json_error():
+    return {
+        'detail': 'Error detail'
+    }
+
+
+@pytest.fixture
+def entity_ref_1(json_asserter):
+    return json_asserter.EntityRef(
+        resource=EXAMPLE_RESOURCE['type'],
+        pk=EXAMPLE_RESOURCE['id'],
+        attributes=EXAMPLE_RESOURCE['attributes'],
+        relationships={'owner': json_asserter.EntityRef(
+            resource=EXAMPLE_USER['type'],
+            pk=EXAMPLE_USER['id'],
+        )})
+
+
+@pytest.fixture
+def entity_ref_3(json_asserter):
+    return json_asserter.EntityRef(
+        resource=EXAMPLE_RESOURCE_3['type'],
+        pk=EXAMPLE_RESOURCE_3['id'],
+        attributes=EXAMPLE_RESOURCE_3['attributes'],
+        relationships={'owner': json_asserter.EntityRef(
+            resource=EXAMPLE_USER['type'],
+            pk=EXAMPLE_USER['id'],
+        )})
+
 class TestAssertionHelper:
 
     @pytest.fixture(scope='session')
@@ -221,6 +250,11 @@ class TestAssertionHelper:
     @pytest.fixture
     def vnd_error_404(self, vnd_error):
         vnd_error['errors'][0]['detail'] = 'Not found'
+        return vnd_error
+
+    @pytest.fixture
+    def vnd_error_405(self, vnd_error):
+        vnd_error['errors'][0]['detail'] = 'Method not allowed'
         return vnd_error
 
     def test_status_200(self, json_asserter, vnd_single, vnd_error_400):
@@ -279,6 +313,20 @@ class TestAssertionHelper:
         response = self.build_response(vnd_error_400, status_code=status.HTTP_400_BAD_REQUEST)
         json_asserter.HTTP_400(response, error='custom error message', pointer='pointer')
 
+    def test_status_400_json(self, json_asserter, vnd_single, json_error):
+        response = self.build_response(json_error, status_code=status.HTTP_400_BAD_REQUEST)
+        json_asserter.HTTP_400(response, error=json_error['detail'], vnd=False)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_200_OK)
+            json_asserter.HTTP_400(response, error='Different error', vnd=False)
+        assert 'status_code 200 != 400' in str(err.value)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_400_BAD_REQUEST)
+            json_asserter.HTTP_400(response, error='Different error', vnd=False)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
+
     def test_status_401(self, json_asserter, vnd_single, vnd_error_401):
         response = self.build_response(vnd_error_401, status_code=status.HTTP_401_UNAUTHORIZED)
         json_asserter.HTTP_401(response)
@@ -287,6 +335,20 @@ class TestAssertionHelper:
             response = self.build_response(vnd_single)
             json_asserter.HTTP_401(response)
         assert 'status_code 200 != 401' in str(err.value)
+
+    def test_status_401_json(self, json_asserter, vnd_single, json_error):
+        response = self.build_response(json_error, status_code=status.HTTP_401_UNAUTHORIZED)
+        json_asserter.HTTP_401(response, error=json_error['detail'], vnd=False)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_200_OK)
+            json_asserter.HTTP_401(response, error='Different error', vnd=False)
+        assert 'status_code 200 != 401' in str(err.value)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_401_UNAUTHORIZED)
+            json_asserter.HTTP_401(response, error='Different error', vnd=False)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
 
     def test_status_403(self, json_asserter, vnd_single, vnd_error_403):
         response = self.build_response(vnd_error_403, status_code=status.HTTP_403_FORBIDDEN)
@@ -297,6 +359,20 @@ class TestAssertionHelper:
             json_asserter.HTTP_403(response)
         assert 'status_code 200 != 403' in str(err.value)
 
+    def test_status_403_json(self, json_asserter, vnd_single, json_error):
+        response = self.build_response(json_error, status_code=status.HTTP_403_FORBIDDEN)
+        json_asserter.HTTP_403(response, error=json_error['detail'], vnd=False)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_200_OK)
+            json_asserter.HTTP_403(response, error='Different error', vnd=False)
+        assert 'status_code 200 != 403' in str(err.value)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_403_FORBIDDEN)
+            json_asserter.HTTP_403(response, error='Different error', vnd=False)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
+
     def test_status_404(self, json_asserter, vnd_single, vnd_error_404):
         response = self.build_response(vnd_error_404, status_code=status.HTTP_404_NOT_FOUND)
         json_asserter.HTTP_404(response)
@@ -305,6 +381,43 @@ class TestAssertionHelper:
             response = self.build_response(vnd_single)
             json_asserter.HTTP_404(response)
         assert 'status_code 200 != 404' in str(err.value)
+
+    def test_status_404_json(self, json_asserter, vnd_single, json_error):
+        response = self.build_response(json_error, status_code=status.HTTP_404_NOT_FOUND)
+        json_asserter.HTTP_404(response, error=json_error['detail'], vnd=False)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_200_OK)
+            json_asserter.HTTP_404(response, error='Different error', vnd=False)
+        assert 'status_code 200 != 404' in str(err.value)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_404_NOT_FOUND)
+            json_asserter.HTTP_404(response, error='Different error', vnd=False)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
+
+    def test_status_405(self, json_asserter, vnd_single, vnd_error_405):
+        response = self.build_response(vnd_error_405, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
+        json_asserter.HTTP_405(response)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(vnd_single)
+            json_asserter.HTTP_405(response)
+        assert 'status_code 200 != 405' in str(err.value)
+
+    def test_status_405_json(self, json_asserter, vnd_single, json_error):
+        response = self.build_response(json_error, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
+        json_asserter.HTTP_405(response, error=json_error['detail'], vnd=False)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_200_OK)
+            json_asserter.HTTP_405(response, error='Different error', vnd=False)
+        assert 'status_code 200 != 405' in str(err.value)
+
+        with pytest.raises(AssertionError) as err:
+            response = self.build_response(json_error, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
+            json_asserter.HTTP_405(response, error='Different error', vnd=False)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
 
     def test_status_500(self, json_asserter, vnd_single, vnd_error):
         vnd_error['errors'][0]['detail'] = 'A server error occurred.'
@@ -761,48 +874,57 @@ class TestAssertionHelper:
             )}
         ))
 
-    def test_vnd_list_entity_list_all_match(self, json_asserter, vnd_list):
+    def test_vnd_list_entity_list_all_match(self, json_asserter, vnd_list, entity_ref_1, entity_ref_3):
         response = self.build_response(vnd_list)
-        entity_1 = json_asserter.EntityRef(
-            resource=EXAMPLE_RESOURCE['type'],
-            pk=EXAMPLE_RESOURCE['id'],
-            attributes=EXAMPLE_RESOURCE['attributes'],
-            relationships={'owner': json_asserter.EntityRef(
-                resource=EXAMPLE_USER['type'],
-                pk=EXAMPLE_USER['id'],
-            )})
-        entity_2 = json_asserter.EntityRef(
-            resource=EXAMPLE_RESOURCE_3['type'],
-            pk=EXAMPLE_RESOURCE_3['id'],
-            attributes=EXAMPLE_RESOURCE_3['attributes'],
-            relationships={'owner': json_asserter.EntityRef(
-                resource=EXAMPLE_USER['type'],
-                pk=EXAMPLE_USER['id'],
-            )})
-        json_asserter.HTTP_200(response, is_list=True, entity_refs=[entity_1, entity_2])
+        json_asserter.HTTP_200(response, is_list=True, entity_refs=[entity_ref_1, entity_ref_3])
 
-    def test_vnd_list_entity_list_one_not_match(self, json_asserter, vnd_list):
+    def test_vnd_list_count(self, json_asserter, vnd_list):
         response = self.build_response(vnd_list)
-        entity_1 = json_asserter.EntityRef(
-            resource=EXAMPLE_RESOURCE['type'],
-            pk=EXAMPLE_RESOURCE['id'],
-            attributes=EXAMPLE_RESOURCE['attributes'],
-            relationships={'owner': json_asserter.EntityRef(
-                resource=EXAMPLE_USER['type'],
-                pk=EXAMPLE_USER['id'],
-            )})
-        entity_2 = json_asserter.EntityRef(
-            resource=EXAMPLE_RESOURCE_3['type'],
-            pk=EXAMPLE_RESOURCE_2['id'],
-            attributes=EXAMPLE_RESOURCE_3['attributes'],
-            relationships={'owner': json_asserter.EntityRef(
-                resource=EXAMPLE_USER['type'],
-                pk=EXAMPLE_USER['id'],
-            )})
+        json_asserter.HTTP_200(response, is_list=True, count=len(vnd_list['data']))
+
+    def test_vnd_list_wrong_count(self, json_asserter, vnd_list):
+        list_length = len(vnd_list['data'])
+        response = self.build_response(vnd_list)
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, is_list=True, count=list_length - 1)
+        assert f'Difference in count of response_data, got {list_length} expected {list_length - 1}' in str(err.value)
+
+    def test_vnd_single_count(self, json_asserter, vnd_single):
+        response = self.build_response(vnd_single)
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, count=1)
+        assert f'Count is only checked when response is list' in str(err.value)
+
+    def test_vnd_list_ordering(self, json_asserter, vnd_list, entity_ref_1, entity_ref_3):
+        response = self.build_response(vnd_list)
+        json_asserter.HTTP_200(response, is_list=True, entity_refs=[entity_ref_1, entity_ref_3], check_ordering=True)
+
+    def test_vnd_list_wrong_ordering(self, json_asserter, vnd_list, entity_ref_1, entity_ref_3):
+        response = self.build_response(vnd_list)
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, is_list=True, entity_refs=[entity_ref_3, entity_ref_1], check_ordering=True)
+        assert 'Invalid ID in ' in str(err.value)
+
+    def test_vnd_list_wrong_ordering_amount(self, json_asserter, vnd_list, entity_ref_1, entity_ref_3):
+        response = self.build_response(vnd_list)
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, is_list=True, entity_refs=[entity_ref_1, entity_ref_3, entity_ref_1],
+                                   check_ordering=True)
+        assert 'Error: more entity refs supplied than available in response data. ' in str(err.value)
+
+    def test_vnd_single_ordering(self, json_asserter, vnd_single, entity_ref_1):
+        response = self.build_response(vnd_single)
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, entity_refs=entity_ref_1, check_ordering=True)
+        assert f'Ordering is only checked when response is list' in str(err.value)
+
+    def test_vnd_list_entity_list_one_not_match(self, json_asserter, vnd_list, entity_ref_1, entity_ref_3):
+        response = self.build_response(vnd_list)
+        entity_ref_3.pk = EXAMPLE_RESOURCE_2['id']
 
         with pytest.raises(AssertionError) as err:
-            json_asserter.HTTP_200(response, is_list=True, entity_refs=[entity_1, entity_2])
-        assert f'{entity_2} NOT IN' in str(err.value)
+            json_asserter.HTTP_200(response, is_list=True, entity_refs=[entity_ref_1, entity_ref_3])
+        assert f'{entity_ref_3} NOT IN' in str(err.value)
 
     def test_plain_json_valid_parameters(self, json_asserter):
         response = self.build_response(EXAMPLE_PLAIN)
@@ -899,6 +1021,28 @@ class TestAssertionHelper:
             json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=[EXAMPLE_PLAIN, EXAMPLE_PLAIN_3])
         assert f'{EXAMPLE_PLAIN_3} NOT IN ' in str(err.value)
 
+    def test_plain_json_attributes_list_ordering(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+        json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=[EXAMPLE_PLAIN, EXAMPLE_PLAIN_2],
+                               check_ordering=True)
+
+    def test_plain_json_attributes_list_wrong_ordering(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=[EXAMPLE_PLAIN_2, EXAMPLE_PLAIN],
+                                   check_ordering=True)
+        assert f'Attribute Value incorrect ' in str(err.value)
+
+    def test_plain_json_attributes_list_wrong_ordering_size(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, vnd=False, is_list=True, check_ordering=True,
+                                   attributes=[EXAMPLE_PLAIN, EXAMPLE_PLAIN_2, EXAMPLE_PLAIN])
+        assert 'Error: more attributes supplied than available in response. 3 found asserted 2' in str(err.value)
+
     def test_plain_json_attributes_list_nested_missing(self, json_asserter):
         response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
 
@@ -920,6 +1064,23 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             json_asserter.HTTP_200(response, vnd=False, is_list=True, attributes=invalid_attributes)
         assert f'{invalid_attributes} NOT IN ' in str(err.value)
+
+    def test_plain_json_list_count(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+        json_asserter.HTTP_200(response, vnd=False, is_list=True, count=2, attributes=[EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+
+    def test_plain_json_list_wrong_count(self, json_asserter):
+        response = self.build_response([EXAMPLE_PLAIN, EXAMPLE_PLAIN_2])
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, vnd=False, attributes=[EXAMPLE_PLAIN, EXAMPLE_PLAIN_2], is_list=True,
+                                   count=1)
+        assert 'Difference in count of response_data, got 2 expected 1' in str(err.value)
+
+    def test_plain_json_single_count(self, json_asserter, vnd_single):
+        response = self.build_response(vnd_single)
+        with pytest.raises(AssertionError) as err:
+            json_asserter.HTTP_200(response, count=1)
+        assert f'Count is only checked when response is list' in str(err.value)
 
 
 class TestJsonAsserterMixin(JsonAsserterMixin):
