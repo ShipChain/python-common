@@ -24,7 +24,6 @@ from django.conf import settings
 from .aws import AWSClient
 
 LOG = logging.getLogger('python-common')
-# pylint: disable=too-many-arguments
 
 
 class AWSIoTClient(AWSClient):
