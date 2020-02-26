@@ -1,9 +1,7 @@
-import json
-
 from httpretty import HTTPretty
 
 from urllib.parse import urlparse
-from ..utils import parse_urlencoded_data
+from src.shipchain_common.utils import parse_urlencoded_data
 
 
 class HTTPrettyAsserter(HTTPretty):
@@ -20,10 +18,7 @@ class HTTPrettyAsserter(HTTPretty):
 
             url = urlparse(call.path)
             if call.headers.get('content-type', '') in ('application/json', 'text/json'):
-                try:
-                    body = json.loads(call.body)
-                except json.JSONDecodeError:
-                    body = None
+                body = call.parsed_body
             else:
                 body = parse_urlencoded_data(call.body.decode())
 
