@@ -123,7 +123,7 @@ class URLShortenerClient(AWSClient):
 
     def __init__(self):
         aws_auth = BotoAWSRequestsAuth(
-            aws_host=settings.URL_SHORTENER_URL,
+            aws_host=settings.URL_SHORTENER_HOST,
             aws_region='us-east-1',
             aws_service='execute-api'
         )

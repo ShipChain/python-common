@@ -12,6 +12,7 @@ from src.shipchain_common.test_utils import mocked_rpc_response
 
 @pytest.fixture(scope='module')
 def iot_settings():
+    settings.URL_SHORTENER_HOST = 'not-really-aws.com'
     settings.URL_SHORTENER_URL = 'not-really-aws.com'
 
 

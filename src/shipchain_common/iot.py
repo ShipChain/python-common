@@ -35,7 +35,7 @@ class AWSIoTClient(AWSClient):
             aws_service='execute-api'
         )
 
-        self.url = f'https://{settings.IOT_AWS_HOST}/{settings.IOT_GATEWAY_STAGE}/'
+        self.url = f'https://{settings.IOT_AWS_HOST}/{settings.IOT_GATEWAY_STAGE}'
         self.session = requests.session()
         self.session.headers = {'content-type': 'application/json'}
         self.session.auth = aws_auth
