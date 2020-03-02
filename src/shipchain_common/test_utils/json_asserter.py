@@ -299,7 +299,7 @@ def _test_regular_json(response, entity_refs=None, included=None, is_list=False,
                 f'{len(attributes)} found asserted {len(response)}'
             for iteration, attribute in enumerate(attributes):
                 _plain_assert_attributes_in_response(response[iteration], attribute)
-        if not (count is None):
+        if count is not None:
             assert len(response) == count,\
                 f'Difference in count of response_data, got {len(response)} expected {count}'
     else:
