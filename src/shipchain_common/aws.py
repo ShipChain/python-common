@@ -80,16 +80,16 @@ class AWSClient:
 
         return response_json
 
-    def _post(self, endpoint=None, payload=None, query_params=None):
+    def _post(self, endpoint='', payload=None, query_params=None):
         return self._call(self.METHOD_POST, endpoint, payload, params=query_params)
 
-    def _put(self, endpoint=None, payload=None, query_params=None):
+    def _put(self, endpoint='', payload=None, query_params=None):
         return self._call(self.METHOD_PUT, endpoint, payload, params=query_params)
 
-    def _get(self, endpoint=None, query_params=None):
+    def _get(self, endpoint='', query_params=None):
         return self._call(self.METHOD_GET, endpoint, params=query_params)
 
-    def _delete(self, endpoint=None, query_params=None):
+    def _delete(self, endpoint='', query_params=None):
         return self._call(self.METHOD_DELETE, endpoint, params=query_params)
 
     @staticmethod
