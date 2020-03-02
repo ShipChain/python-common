@@ -40,7 +40,8 @@ class AWSClient:
 
     def _call(self, http_method, endpoint, payload=None, params=None):
         metric_name = self._get_generic_endpoint_for_metric(http_method, endpoint)
-        self.url = f'{self.url}/{endpoint}'
+        calling_url = f'{self.url}/{endpoint}'
+
         if payload:
             payload = json.dumps(payload, cls=DecimalEncoder)
 
@@ -49,14 +50,14 @@ class AWSClient:
             with TimingMetric('python_common_aws.call', tags={'method': metric_name}) as timer:
 
                 if http_method == self.METHOD_POST:
-                    response = self.session.post(self.url, data=payload, params=params)
+                    response = self.session.post(calling_url, data=payload, params=params)
                     response_json = response.json()
 
                     if response.status_code != status.HTTP_201_CREATED:
                         self._process_error_object(metric_name, response, response_json)
 
                 elif http_method in self.RESPONSE_200_METHODS:
-                    response = getattr(self.session, http_method)(self.url, data=payload, params=params)
+                    response = getattr(self.session, http_method)(calling_url, data=payload, params=params)
                     response_json = response.json()
 
                     if response.status_code != status.HTTP_200_OK:
