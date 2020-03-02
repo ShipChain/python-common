@@ -27,6 +27,8 @@ LOG = logging.getLogger('python-common')
 
 
 class AWSIoTClient(AWSClient):
+    url = f'https://{settings.IOT_AWS_HOST}/{settings.IOT_GATEWAY_STAGE}'
+    session = requests.session()
 
     def __init__(self):
         aws_auth = BotoAWSRequestsAuth(
@@ -35,8 +37,6 @@ class AWSIoTClient(AWSClient):
             aws_service='execute-api'
         )
 
-        self.url = f'https://{settings.IOT_AWS_HOST}/{settings.IOT_GATEWAY_STAGE}'
-        self.session = requests.session()
         self.session.headers = {'content-type': 'application/json'}
         self.session.auth = aws_auth
 

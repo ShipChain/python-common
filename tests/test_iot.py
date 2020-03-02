@@ -2,36 +2,19 @@ import pytest
 from unittest import mock
 
 import requests
-from aws_requests_auth.boto_utils import BotoAWSRequestsAuth
-from django.conf import settings
 
 from src.shipchain_common.exceptions import AWSIoTError
 from src.shipchain_common.iot import AWSIoTClient
 from src.shipchain_common.test_utils import mocked_rpc_response
 
 
-@pytest.fixture(scope='module')
-def iot_settings():
-    settings.IOT_AWS_HOST = 'not-really-aws.com'
-    settings.IOT_GATEWAY_STAGE = 'test'
-
-
 @pytest.fixture()
-def aws_iot_client(iot_settings):
+def aws_iot_client():
     return AWSIoTClient()
 
 
-class FakeBotoAWSRequestsAuth(BotoAWSRequestsAuth):
-    def __init__(self, *args, **kwargs):
-        pass
+def test_init(aws_iot_client):
 
-    def get_aws_request_headers_handler(self, r):
-        return {}
-
-
-def test_init(iot_settings, aws_iot_client):
-
-    assert settings.IOT_GATEWAY_STAGE == 'test'
     assert aws_iot_client.session.auth.aws_host == 'not-really-aws.com'
     assert aws_iot_client.session.auth.aws_region == 'us-east-1'
     assert aws_iot_client.session.auth.service == 'execute-api'

@@ -2,34 +2,18 @@ import pytest
 from unittest import mock
 
 import requests
-from aws_requests_auth.boto_utils import BotoAWSRequestsAuth
-from django.conf import settings
 
 from src.shipchain_common.exceptions import AWSIoTError
 from src.shipchain_common.aws import URLShortenerClient
 from src.shipchain_common.test_utils import mocked_rpc_response
 
 
-@pytest.fixture(scope='module')
-def iot_settings():
-    settings.URL_SHORTENER_HOST = 'not-really-aws.com'
-    settings.URL_SHORTENER_URL = 'not-really-aws.com'
-
-
 @pytest.fixture()
-def aws_url_client(iot_settings):
+def aws_url_client():
     return URLShortenerClient()
 
 
-class FakeBotoAWSRequestsAuth(BotoAWSRequestsAuth):
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def get_aws_request_headers_handler(self, r):
-        return {}
-
-
-def test_init(iot_settings, aws_url_client):
+def test_init(aws_url_client):
     assert aws_url_client.session.auth.aws_host == 'not-really-aws.com'
     assert aws_url_client.session.auth.aws_region == 'us-east-1'
     assert aws_url_client.session.auth.service == 'execute-api'

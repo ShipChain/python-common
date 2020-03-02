@@ -30,6 +30,13 @@ LOG = logging.getLogger('python-common')
 
 
 class AWSClient:
+    @property
+    def url(self):
+        raise NotImplementedError
+
+    @property
+    def session(self):
+        raise NotImplementedError
 
     METHOD_POST = 'post'
     METHOD_PUT = 'put'
@@ -121,6 +128,8 @@ class AWSClient:
 
 
 class URLShortenerClient(AWSClient):
+    url = settings.URL_SHORTENER_URL
+    session = requests.session()
 
     def __init__(self):
         aws_auth = BotoAWSRequestsAuth(
@@ -129,8 +138,6 @@ class URLShortenerClient(AWSClient):
             aws_service='execute-api'
         )
 
-        self.url = settings.URL_SHORTENER_URL
-        self.session = requests.session()
         self.session.headers = {'content-type': 'application/json'}
         self.session.auth = aws_auth
 
