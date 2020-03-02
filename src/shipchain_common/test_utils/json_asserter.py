@@ -33,32 +33,42 @@ class EntityReferenceClass:
                f'attributes: {self.attributes}; relationships: {self.relationships}'
 
 
-def response_has_error(response, error, pointer=None):
-    if error is not None:
-        response_json = response.json()
-        assert 'errors' in response_json, f'Malformed error response: {response_json}'
-        assert isinstance(response_json['errors'], list), f'Error response not a list: {response_json}'
+def _vnd_has_error(response_json, error, pointer=None):
+    assert 'errors' in response_json, f'Malformed error response: {response_json}'
+    errors = response_json['errors']
+    assert isinstance(errors, list), f'Error response not a list: {errors}'
+    error_found = False
 
-        error_found = False
+    for single_error in errors:
+        if error in single_error['detail']:
+            error_found = True
+            if pointer:
+                found_pointer = single_error['source']['pointer']
+                assert pointer in found_pointer, f'Error `{pointer}` not found in {found_pointer}'
 
-        for single_error in response_json['errors']:
-            if error in single_error['detail']:
-                error_found = True
-                if pointer:
-                    found_pointer = single_error['source']['pointer']
-                    assert pointer in found_pointer, f'Error `{pointer}` not found in {found_pointer}'
-
-        if not error_found:
-            assert False, f'Error `{error}` not found in {response_json}'
+    if not error_found:
+        assert False, f'Error `{error}` not found in {errors}'
 
 
-def response_has_json_error(response, error):
-    if error is not None:
-        response_json = response.json()
-        assert 'detail' in response_json, f'Malformed error response: {response_json}'
-        assert isinstance(response_json, dict), f'Error response not a dict: {response_json}'
+def _json_has_error(errors, error):
+    assert isinstance(errors, dict), f'Error response not a dict: {errors}'
 
-        assert response_json['detail'] == error, f'Error {error} not found in {response_json["detail"]}'
+    assert errors['detail'] == error, f'Error {error} not found in {errors}'
+
+
+def response_has_error(response, error, pointer=None, vnd=True):
+    if error is None:
+        return
+
+    response_json = response.json()
+
+    # application/vnd.api+json
+    if vnd:
+        _vnd_has_error(response_json, error, pointer)
+
+    # application/json
+    else:
+        _json_has_error(response_json, error)
 
 
 def _vnd_assert_attributes(response_data, attributes):
@@ -245,7 +255,7 @@ def _test_vnd_json(response, entity_refs=None, included=None, is_list=False, cou
                 for iteration, entity_ref in enumerate(entity_refs):
                     _vnd_assertions(response_data[iteration], entity_ref)
 
-        if not (count is None):
+        if count is not None:
             assert len(response_data) == count, \
                 f'Difference in count of response_data, got {len(response_data)} expected {count}'
 
@@ -369,46 +379,31 @@ def assert_204(response):
 def assert_400(response, error=None, pointer=None, vnd=True):
     assert response is not None
     assert response.status_code == status.HTTP_400_BAD_REQUEST, f'status_code {response.status_code} != 400'
-    if vnd:
-        response_has_error(response, error, pointer)
-    else:
-        response_has_json_error(response, error)
+    response_has_error(response, error, pointer, vnd)
 
 
 def assert_401(response, error='Authentication credentials were not provided', vnd=True):
     assert response is not None
     assert response.status_code == status.HTTP_401_UNAUTHORIZED, f'status_code {response.status_code} != 401'
-    if vnd:
-        response_has_error(response, error)
-    else:
-        response_has_json_error(response, error)
+    response_has_error(response, error, vnd=vnd)
 
 
 def assert_403(response, error='You do not have permission to perform this action', vnd=True):
     assert response is not None
     assert response.status_code == status.HTTP_403_FORBIDDEN, f'status_code {response.status_code} != 403'
-    if vnd:
-        response_has_error(response, error)
-    else:
-        response_has_json_error(response, error)
+    response_has_error(response, error, vnd=vnd)
 
 
 def assert_404(response, error='Not found', pointer=None, vnd=True):
     assert response is not None
     assert response.status_code == status.HTTP_404_NOT_FOUND, f'status_code {response.status_code} != 404'
-    if vnd:
-        response_has_error(response, error, pointer)
-    else:
-        response_has_json_error(response, error)
+    response_has_error(response, error, pointer, vnd)
 
 
 def assert_405(response, error='Method not allowed', pointer=None, vnd=True):
     assert response is not None
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED, f'status_code {response.status_code} != 405'
-    if vnd:
-        response_has_error(response, error, pointer)
-    else:
-        response_has_json_error(response, error)
+    response_has_error(response, error, pointer, vnd)
 
 
 def assert_500(response, error='A server error occurred.', pointer=None):
