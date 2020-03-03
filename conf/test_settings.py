@@ -69,3 +69,9 @@ SIMPLE_JWT = {
 
 
 SIMPLE_JWT['VERIFYING_KEY'] = SIMPLE_JWT['PRIVATE_KEY'].public_key()
+
+URL_SHORTENER_HOST = 'not-really-aws.com'
+URL_SHORTENER_URL = 'not-really-aws.com'
+
+IOT_AWS_HOST = 'not-really-aws.com'
+IOT_GATEWAY_STAGE = 'test'
