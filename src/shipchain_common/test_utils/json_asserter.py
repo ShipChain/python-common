@@ -52,8 +52,9 @@ def _vnd_has_error(response_json, error, pointer=None):
 
 def _json_has_error(errors, error):
     assert isinstance(errors, dict), f'Error response not a dict: {errors}'
+    assert 'detail' in errors, f'Malformed error response: {errors}'
 
-    assert errors['detail'] == error, f'Error {error} not found in {errors}'
+    assert errors['detail'] == error, f'Error {error} not found in {errors["detail"]}'
 
 
 def response_has_error(response, error, pointer=None, vnd=True):

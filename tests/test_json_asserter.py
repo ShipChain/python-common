@@ -325,7 +325,7 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             response = self.build_response(json_error, status_code=status.HTTP_400_BAD_REQUEST)
             json_asserter.HTTP_400(response, error='Different error', vnd=False)
-        assert f'Error Different error not found in {json_error}' in str(err.value)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
 
     def test_status_401(self, json_asserter, vnd_single, vnd_error_401):
         response = self.build_response(vnd_error_401, status_code=status.HTTP_401_UNAUTHORIZED)
@@ -348,7 +348,7 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             response = self.build_response(json_error, status_code=status.HTTP_401_UNAUTHORIZED)
             json_asserter.HTTP_401(response, error='Different error', vnd=False)
-        assert f'Error Different error not found in {json_error}' in str(err.value)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
 
     def test_status_403(self, json_asserter, vnd_single, vnd_error_403):
         response = self.build_response(vnd_error_403, status_code=status.HTTP_403_FORBIDDEN)
@@ -371,7 +371,7 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             response = self.build_response(json_error, status_code=status.HTTP_403_FORBIDDEN)
             json_asserter.HTTP_403(response, error='Different error', vnd=False)
-        assert f'Error Different error not found in {json_error}' in str(err.value)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
 
     def test_status_404(self, json_asserter, vnd_single, vnd_error_404):
         response = self.build_response(vnd_error_404, status_code=status.HTTP_404_NOT_FOUND)
@@ -394,7 +394,7 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             response = self.build_response(json_error, status_code=status.HTTP_404_NOT_FOUND)
             json_asserter.HTTP_404(response, error='Different error', vnd=False)
-        assert f'Error Different error not found in {json_error}' in str(err.value)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
 
     def test_status_405(self, json_asserter, vnd_single, vnd_error_405):
         response = self.build_response(vnd_error_405, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -417,7 +417,7 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             response = self.build_response(json_error, status_code=status.HTTP_405_METHOD_NOT_ALLOWED)
             json_asserter.HTTP_405(response, error='Different error', vnd=False)
-        assert f'Error Different error not found in {json_error}' in str(err.value)
+        assert f'Error Different error not found in {json_error["detail"]}' in str(err.value)
 
     def test_status_500(self, json_asserter, vnd_single, vnd_error):
         vnd_error['errors'][0]['detail'] = 'A server error occurred.'
