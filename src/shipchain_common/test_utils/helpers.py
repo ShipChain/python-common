@@ -24,7 +24,6 @@ import jwt
 from django.conf import settings
 from django.test.client import encode_multipart
 from rest_framework_simplejwt.utils import aware_utcnow, datetime_to_epoch
-from rest_framework.test import APIClient
 
 
 def create_form_content(data):
@@ -132,18 +131,3 @@ class GeoCoderResponse:
     def __init__(self, status, point=None):
         self.ok = status
         self.xy = point
-
-
-# pylint: disable=too-many-arguments, redefined-builtin
-class JsonAPIClient(APIClient):
-    def post(self, path, data=None, format='json', content_type=None, follow=False, **extra):
-        return super().post(path, data=data, format=format, content_type=content_type, follow=follow, **extra)
-
-    def put(self, path, data=None, format='json', content_type=None, follow=False, **extra):
-        return super().put(path, data=data, format=format, content_type=content_type, follow=follow, **extra)
-
-    def patch(self, path, data=None, format='json', content_type=None, follow=False, **extra):
-        return super().patch(path, data=data, format=format, content_type=content_type, follow=follow, **extra)
-
-    def delete(self, path, data=None, format='json', content_type=None, follow=False, **extra):
-        return super().delete(path, data=data, format=format, content_type=content_type, follow=follow, **extra)
