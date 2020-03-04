@@ -28,7 +28,8 @@ from .helpers import\
     random_location,\
     random_timestamp, \
     replace_variables_in_string, \
-    GeoCoderResponse
+    GeoCoderResponse, \
+    JsonAPIClient
 
 from .mocked_rpc_responses import \
     mocked_rpc_response, \
