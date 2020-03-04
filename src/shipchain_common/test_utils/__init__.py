@@ -29,8 +29,7 @@ from .helpers import\
     random_timestamp, \
     replace_variables_in_string, \
     GeoCoderResponse, \
-    JsonAPIClient, \
-    pytest_configure
+    JsonAPIClient
 
 from .mocked_rpc_responses import \
     mocked_rpc_response, \
