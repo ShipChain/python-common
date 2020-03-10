@@ -188,36 +188,7 @@ def invalid_url(request, exception, *args, **kwargs):
     return JsonResponse(data, status=status.HTTP_404_NOT_FOUND)
 
 
-class AWSIoTError(APIException):
-    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    default_detail = 'Internal Service Error.'
-    default_code = 'server_error'
-
-    def __init__(self, detail, status_code=None, code=None):
-        super(AWSIoTError, self).__init__(detail, code)
-        self.detail = detail
-
-        if status_code:
-            self.status_code = status_code
-
-
-class RPCError(APIException):
-    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    default_detail = 'Internal Service Error.'
-    default_code = 'server_error'
-
-    def __init__(self, detail, status_code=None, code=None):
-        super(RPCError, self).__init__(detail, code)
-        self.detail = detail
-
-        if status_code:
-            self.status_code = status_code
-
-
-class URLShortenerError(APIException):
-    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
-    default_detail = 'URL Shortener Error.'
-    default_code = 'server_error'
+class Custom500Error(APIException):
 
     def __init__(self, detail, status_code=None, code=None):
         super().__init__(detail, code)
@@ -225,3 +196,21 @@ class URLShortenerError(APIException):
 
         if status_code:
             self.status_code = status_code
+
+
+class AWSIoTError(Custom500Error):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    default_detail = 'Internal Service Error.'
+    default_code = 'server_error'
+
+
+class RPCError(Custom500Error):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    default_detail = 'Internal Service Error.'
+    default_code = 'server_error'
+
+
+class URLShortenerError(Custom500Error):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    default_detail = 'URL Shortener Error.'
+    default_code = 'server_error'
