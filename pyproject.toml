@@ -32,6 +32,7 @@ djangorestframework-jsonapi = "~3"
 drf-nested-routers = "^0.91.0"
 python-dateutil = "~2.7.5"
 requests = "^2.21"
+
 [tool.poetry.dev-dependencies]
 bandit = "^1.5"
 coverage = "~4.5.1"
@@ -46,4 +47,3 @@ safety = "^1.8"
 
 [tool.poetry.plugins."pytest11"]
 "json_asserter" = "shipchain_common.test_utils.json_asserter"
-"modified_http_pretty" = "shipchain_common.test_utils.modified_http_pretty"
