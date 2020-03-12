@@ -232,7 +232,6 @@ pyjwt = "*"
 reference = "3cecdfc8050b691e51e7d45229d8bd7c03a8d6c2"
 type = "git"
 url = "git://github.com/ShipChain/django-rest-framework-simplejwt.git"
-
 [[package]]
 category = "main"
 description = "Docutils -- Python Documentation Utilities"
@@ -765,14 +764,6 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "0.3.1"
 
 [[package]]
-category = "main"
-description = "UNKNOWN"
-name = "src"
-optional = false
-python-versions = "*"
-version = "0.0.7"
-
-[[package]]
 category = "dev"
 description = "Manage dynamic plugins for Python applications"
 name = "stevedore"
@@ -790,7 +781,7 @@ description = "Extract the top-level domain (TLD) from the URL given."
 name = "tld"
 optional = false
 python-versions = ">=2.7, <4"
-version = "0.11.10"
+version = "0.11.11"
 
 [[package]]
 category = "dev"
@@ -827,7 +818,7 @@ python-versions = ">=3.6"
 version = "3.1.0"
 
 [metadata]
-content-hash = "7ff4e56e7fd46f093f677a960442d5c2e6f1fa921fe056cd4d93e038a55ca32e"
+content-hash = "6ce8db2be19196ffb69372c426d6cdb650997b9e133990c9c12cd4a756159968"
 python-versions = ">=3.6,<3.8"  # Compatible python versions must be declared here
 
 [metadata.hashes]
@@ -903,9 +894,8 @@ six = ["236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a", "8f3c
 smmap = ["171484fe62793e3626c8b05dd752eb2ca01854b0c55a1efc0dc4210fccb65446", "5fead614cf2de17ee0707a8c6a5f2aa5a2fc6c698c70993ba42f515485ffda78"]
 snowballstemmer = ["209f257d7533fdb3cb73bdbd24f436239ca3b2fa67d56f6ff88e86be08cc5ef0", "df3bac3df4c2c01363f3dd2cfa78cce2840a79b9f1c2d2de9ce8d31683992f52"]
 sqlparse = ["022fb9c87b524d1f7862b3037e541f68597a730a8843245c349fc93e1643dc4e", "e162203737712307dfe78860cc56c8da8a852ab2ee33750e33aeadf38d12c548"]
-src = ["2a33bd2995800b2d3fc80efb94a300951413e02ede94691aef58bffbd69e5b0e"]
 stevedore = ["18afaf1d623af5950cc0f7e75e70f917784c73b652a34a12d90b309451b5500b", "a4e7dc759fb0f2e3e2f7d8ffe2358c19d45b9b8297f393ef1256858d82f69c9b"]
-tld = ["150bd40b4be209903ecac530496b04a7e125272f5701a1e5d34ae47b0d40e991", "27cfddb10e3aa244c5ed86857a188dac476f0af10202a5c57051fdc5632c866c", "68124193d10c2dadb548ef1426ef3bc112eef0127a6a2c2477a9253710f8ae24", "9cc26414f9efc58523c6bf88bc4340bf45b3a489b8aa901016a8537a2c172eee", "aabb437f9fc855d279f7b31118d0036ca1005fe86f344c1eecbcfa149b50fc97", "ae844554b55ee6a82b67e6a2fd08cd924528be5d772edadb1d9412749d18d340"]
+tld = ["670f30e23ed35a7f9ee459801950e49b02554477d4d3e72cd2d92d39b2267470", "72c7170f68ade92a07be43b363afc8e42a98ffa3700d899a984fdbeedb339bac", "a31d333253cc3033999ad5e6a2a34e9453bf9ac700de82da5f1e7487e4acbdaa", "d13fe1171c8d9d383ce822c50915d35ba52c3b78fb7caacb10035230e2e113f7", "f466c6eb96e7dbc51817d2dbc9a832e78b0cad6661740334016a79bfdb1477b1", "fc8267ee1d78ba02b8970199af0c0efb4624ac3e2177e50cbf05916bd5df8b12"]
 typed-ast = ["0666aa36131496aed8f7be0410ff974562ab7eeac11ef351def9ea6fa28f6355", "0c2c07682d61a629b68433afb159376e24e5b2fd4641d35424e462169c0a7919", "249862707802d40f7f29f6e1aad8d84b5aa9e44552d2cc17384b209f091276aa", "24995c843eb0ad11a4527b026b4dde3da70e1f2d8806c99b7b4a7cf491612652", "269151951236b0f9a6f04015a9004084a5ab0d5f19b57de779f908621e7d8b75", "4083861b0aa07990b619bd7ddc365eb7fa4b817e99cf5f8d9cf21a42780f6e01", "498b0f36cc7054c1fead3d7fc59d2150f4d5c6c56ba7fb150c013fbc683a8d2d", "4e3e5da80ccbebfff202a67bf900d081906c358ccc3d5e3c8aea42fdfdfd51c1", "6daac9731f172c2a22ade6ed0c00197ee7cc1221aa84cfdf9c31defeb059a907", "715ff2f2df46121071622063fc7543d9b1fd19ebfc4f5c8895af64a77a8c852c", "73d785a950fc82dd2a25897d525d003f6378d1cb23ab305578394694202a58c3", "8c8aaad94455178e3187ab22c8b01a3837f8ee50e09cf31f1ba129eb293ec30b", "8ce678dbaf790dbdb3eba24056d5364fb45944f33553dd5869b7580cdbb83614", "aaee9905aee35ba5905cfb3c62f3e83b3bec7b39413f0a7f19be4e547ea01ebb", "bcd3b13b56ea479b3650b82cabd6b5343a625b0ced5429e4ccad28a8973f301b", "c9e348e02e4d2b4a8b2eedb48210430658df6951fa484e59de33ff773fbd4b41", "d205b1b46085271b4e15f670058ce182bd1199e56b317bf2ec004b6a44f911f6", "d43943ef777f9a1c42bf4e552ba23ac77a6351de620aa9acf64ad54933ad4d34", "d5d33e9e7af3b34a40dc05f498939f0ebf187f07c385fd58d591c533ad8562fe", "fc0fea399acb12edbf8a628ba8d2312f583bdbdb3335635db062fa98cf71fca4", "fe460b922ec15dd205595c9b5b99e2f056fd98ae8f9f56b888e7a17dc2b757e7"]
 urllib3 = ["2f3db8b19923a873b3e5256dc9c2dedfa883e33d87c690d9c7913e1f40673cdc", "87716c2d2a7121198ebcb7ce7cccf6ce5e9ba539041cfbaeecfb641dc0bf6acc"]
 wrapt = ["b62ffa81fb85f4332a4f609cab4ac40709470da05643a082ec1eb88e6d9b97d7"]
