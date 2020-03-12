@@ -1,3 +1,18 @@
+"""
+Copyright 2020 ShipChain, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
 import json
 
 import pytest
@@ -5,16 +20,9 @@ from rest_framework import status
 import requests
 from datetime import datetime
 from src.shipchain_common.utils import parse_urlencoded_data
-from src.shipchain_common.test_utils import HTTPrettyAsserter
+from src.shipchain_common.test_utils import modified_http_pretty
 
 CURRENT_TIME = datetime.now()
-
-
-@pytest.yield_fixture
-def modified_http_pretty():
-    HTTPrettyAsserter.enable(allow_net_connect=False)
-    yield HTTPrettyAsserter
-    HTTPrettyAsserter.disable()
 
 
 @pytest.fixture
