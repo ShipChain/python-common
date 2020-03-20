@@ -17,7 +17,7 @@ import pytest
 from httpretty import HTTPretty
 
 from urllib.parse import urlparse
-from src.shipchain_common.utils import parse_urlencoded_data
+from ..utils import parse_urlencoded_data
 
 
 class HTTPrettyAsserter(HTTPretty):
