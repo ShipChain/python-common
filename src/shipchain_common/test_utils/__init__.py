@@ -40,4 +40,8 @@ from .mocked_rpc_responses import \
     invalid_ship_amount, \
     valid_eth_amount
 
+from .httpretty_asserter import \
+    HTTPrettyAsserter, \
+    modified_http_pretty
+
 from ..utils import validate_uuid4  # Imported for backwards compatibility usage of `from shipchain_common.test_utils`
