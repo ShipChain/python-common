@@ -24,7 +24,7 @@ python = ">=3.6,<3.8"  # Compatible python versions must be declared here
 aws-requests-auth = "~0.4"
 boto3 = "~1.9"
 cryptography = "~2.5"
-django = "~2.2.7"
+django = "~2.2.12"
 django-enumfields = "~0.10.0"
 django-influxdb-tagged-metrics = '==1.3.3'
 djangorestframework = "~3.10"
