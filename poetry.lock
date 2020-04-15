@@ -257,8 +257,8 @@ category = "dev"
 description = "A minimal JSON Web Token authentication plugin for Django REST Framework"
 name = "djangorestframework-simplejwt"
 optional = false
-python-versions = ">=3.6,<3.8"
-version = "4.3.0"
+python-versions = ">=3.6,<3.9"
+version = "4.4.0"
 
 [package.dependencies]
 django = "*"
@@ -273,9 +273,9 @@ python-jose = ["python-jose (3.0.0)"]
 test = ["cryptography", "pytest-cov", "pytest-django", "pytest-xdist", "pytest", "tox"]
 
 [package.source]
-reference = "3cecdfc8050b691e51e7d45229d8bd7c03a8d6c2"
+reference = "04a4f7f2e045ac4a49542b7e98350e66431adcf5"
 type = "git"
-url = "git://github.com/ShipChain/django-rest-framework-simplejwt.git"
+url = "git://github.com/davesque/django-rest-framework-simplejwt.git"
 [[package]]
 category = "main"
 description = "Docutils -- Python Documentation Utilities"
@@ -1023,7 +1023,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "a206e812c557d6babbc0f157ea667230bd9b9e9bcd30b91eec858583da10aa1d"
+content-hash = "24ed707fd79d1bfc37f811ee2de02d7f9294b855720075fde1bf72f93225c069"
 python-versions = ">=3.6,<3.8"  # Compatible python versions must be declared here
 
 [metadata.files]

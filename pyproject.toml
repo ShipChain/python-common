@@ -36,7 +36,7 @@ requests = "^2.21"
 [tool.poetry.dev-dependencies]
 bandit = "^1.5"
 coverage = "~4.5.1"
-djangorestframework-simplejwt = {git = "git://github.com/ShipChain/django-rest-framework-simplejwt.git", rev = "3cecdfc8050b691e51e7d45229d8bd7c03a8d6c2"}
+djangorestframework-simplejwt = {git = "git://github.com/davesque/django-rest-framework-simplejwt.git", rev = "04a4f7f2e045ac4a49542b7e98350e66431adcf5"}
 httpretty = "~=0.9"
 prospector = "~1.1.6.2"
 pytest = "^3.0"
