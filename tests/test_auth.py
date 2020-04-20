@@ -14,7 +14,8 @@ from django.http.request import HttpRequest
 from rest_framework import exceptions
 from rest_framework_simplejwt.tokens import UntypedToken
 
-from src.shipchain_common.authentication import EngineRequest, passive_credentials_auth, PermissionedTokenUser
+from src.shipchain_common.authentication import EngineRequest, passive_credentials_auth, PermissionedTokenUser,\
+    TransmissionRequest
 from src.shipchain_common.test_utils import get_jwt
 from src.shipchain_common.utils import random_id
 
@@ -35,6 +36,11 @@ def organization_id():
 @pytest.fixture()
 def engine_request():
     return EngineRequest()
+
+
+@pytest.fixture()
+def transmission_request():
+    return TransmissionRequest()
 
 
 def test_passive_jwt_auth(username):
@@ -81,6 +87,35 @@ def test_engine_auth_requires_header(engine_request):
 
     request.META['X_SSL_CLIENT_DN'] = '/CN=engine.test-internal'
     assert engine_request.has_permission(request, {})
+
+
+def test_transmission_auth_requires_header(transmission_request):
+    request = HttpRequest()
+
+    assert not transmission_request.has_permission(request, {})
+
+    request.META['X_NGINX_SOURCE'] = 'alb'
+    assert not transmission_request.has_permission(request, {})
+
+    request.META['X_NGINX_SOURCE'] = 'internal'
+    with pytest.raises(KeyError):
+        transmission_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_VERIFY'] = 'NONE'
+    assert not transmission_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_VERIFY'] = 'SUCCESS'
+    with pytest.raises(KeyError):
+        transmission_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_DN'] = '/CN=transmission.h4ck3d'
+    assert not transmission_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_DN'] = '/CN=profiles.test-internal'
+    assert not transmission_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_DN'] = '/CN=transmission.test-internal'
+    assert transmission_request.has_permission(request, {})
 
 
 def test_token_user_jti_cache_key():

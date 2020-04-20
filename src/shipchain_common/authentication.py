@@ -62,6 +62,10 @@ class EngineRequest(InternalRequest):
     SERVICE_NAME = 'engine'
 
 
+class TransmissionRequest(InternalRequest):
+    SERVICE_NAME = 'transmission'
+
+
 class PermissionedTokenUser(TokenUser):
     """
     This Requires the JWT from Profiles to have been generated with the `permissions` scope
