@@ -79,9 +79,7 @@ class HTTPrettyAsserter(HTTPretty):
         # However, if calls were mocked in previous tests and were not asserted, then it can cause issues when
         # asserting calls in a specific test.
 
-        for index, call in enumerate(cls.latest_requests):
-            if call is None:
-                continue
+        for index, _ in enumerate(cls.latest_requests):
             cls.latest_requests[index] = None
 
 
