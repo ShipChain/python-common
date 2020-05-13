@@ -73,9 +73,19 @@ class HTTPrettyAsserter(HTTPretty):
             assert assertion['query'] == call['query'], \
                 f'Error: query mismatch, desired `{assertion["query"]}` returned `{call["query"]}`.'
 
+    @classmethod
+    def reset_calls(cls):
+        # If calling cls.reset(), latest_requests are unable to build.
+        # However, if calls were mocked in previous tests and were not asserted, then it can cause issues when
+        # asserting calls in a specific test.
+
+        for index, _ in enumerate(cls.latest_requests):
+            cls.latest_requests[index] = None
+
 
 @pytest.yield_fixture
 def modified_http_pretty():
     HTTPrettyAsserter.enable(allow_net_connect=False)
     yield HTTPrettyAsserter
+    HTTPrettyAsserter.reset_calls()
     HTTPrettyAsserter.disable()

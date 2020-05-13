@@ -245,3 +245,12 @@ class TestHttprettyList:
         with pytest.raises(AssertionError) as err:
             http_pretty_list_mocking.assert_calls(successful_assertions)
         assert f'Error: No calls made to be parsed.' in str(err.value)
+
+    def test_reset_between_tests(self, http_pretty_list_mocking, failing_host_assertions):
+        requests.post('http://google.com/path')
+
+    def test_default_reset_calls(self, http_pretty_list_mocking, query_string, successful_json_body, single_assertions):
+        requests.post('http://google.com/path?' + query_string, data=successful_json_body,
+                      headers={'content-type': 'application/json'})
+
+        http_pretty_list_mocking.assert_calls(single_assertions)

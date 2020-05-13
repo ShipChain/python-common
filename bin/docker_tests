@@ -13,7 +13,7 @@ bin/dc up -d
 
 bin/dc exec -T shipchain-common /bin/bash -c '! poetry install --dry-run | grep "Warning: The lock file is not up to date" || (echo "poetry.lock does not match pyproject.toml" && exit 1)'
 
-bin/dc exec -T shipchain-common safety check
+bin/dc exec -T shipchain-common safety check -i 38224
 
 bin/dc exec -T shipchain-common prospector -o pylint
 

@@ -67,7 +67,7 @@ def assertDeepAlmostEqual(test_case, expected, actual, *args, **kwargs):  # nope
         raise exc
 
 
-def _parse_value(item):
+def parse_value(item):
     if str(item).lower() in ('true', 'false'):
         # json.loads will parse lowercase booleans
         item = str(item).lower()
@@ -86,9 +86,9 @@ def parse_urlencoded_data(data):
         body = {}
         for key, val in parse_qs(data).items():
             if len(val) > 1:
-                body[key] = [_parse_value(el) for el in val]
+                body[key] = [parse_value(el) for el in val]
             else:
-                body[key] = _parse_value(val[0])
+                body[key] = parse_value(val[0])
     return body
 
 

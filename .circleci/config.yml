@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Package safety check
           command: |
-            bin/dc exec -T shipchain-common safety check
+            bin/dc exec -T shipchain-common safety check -i 38224
       - run:
           name: PEP8 Lint check
           command: |
