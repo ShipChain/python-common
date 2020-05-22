@@ -45,5 +45,5 @@ pytest-django = "^3.6"
 pytest-mock = "^1.10"
 safety = "^1.8"
 
-[tool.poetry.plugins."pytest11"]
-"modified_http_pretty" = "shipchain_common.test_utils.modified_http_pretty"
+#[tool.poetry.plugins."pytest11"]
+#"modified_http_pretty" = "shipchain_common.test_utils.modified_http_pretty"
