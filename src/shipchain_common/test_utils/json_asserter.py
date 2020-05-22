@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import pytest
 from rest_framework import status
 
 # pylint: disable=too-many-branches
@@ -401,7 +400,9 @@ def assert_404(response, error='Not found', pointer=None, vnd=True):
     response_has_error(response, error, pointer, vnd)
 
 
-def assert_405(response, error='Method not allowed', pointer=None, vnd=True):
+def assert_405(response, error=None, pointer=None, vnd=True):
+    if error is None:
+        error = f'Method "{response.renderer_context["request"].method}" not allowed.'
     assert response is not None
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED, f'status_code {response.status_code} != 405'
     response_has_error(response, error, pointer, vnd)
@@ -435,14 +436,3 @@ class AssertionHelper:
 
     HTTP_500 = assert_500
     HTTP_503 = assert_503
-
-
-@pytest.fixture(scope='session')
-def json_asserter():
-    return AssertionHelper
-
-
-class JsonAsserterMixin:
-    @pytest.fixture(autouse=True)
-    def set_json_asserter(self, json_asserter):
-        self.json_asserter = json_asserter
