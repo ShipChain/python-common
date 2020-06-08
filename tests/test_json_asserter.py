@@ -105,6 +105,10 @@ def vnd_single():
                         }
                     ]
                 }
+            },
+            'meta': {
+                'key': 'value',
+                'other_key': 'other_value',
             }
         },
         'included': [
@@ -1080,3 +1084,58 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             AssertionHelper.HTTP_200(response, count=1)
         assert f'Count is only checked when response is list' in str(err.value)
+
+    def test_vnd_meta(self, vnd_single):
+        response = self.build_response(vnd_single)
+        AssertionHelper.HTTP_200(response, entity_refs=AssertionHelper.EntityRef(
+            resource=EXAMPLE_RESOURCE['type'],
+            meta={
+                'key': 'value',
+                'other_key': 'other_value'
+            },
+         ))
+
+    def test_vnd_meta_mismatch(self, vnd_single):
+        response = self.build_response(vnd_single)
+        with pytest.raises(AssertionError) as err:
+            AssertionHelper.HTTP_200(response, entity_refs=AssertionHelper.EntityRef(
+                resource=EXAMPLE_RESOURCE['type'],
+                meta={
+                    'key': 'different value'
+                },
+             ))
+        assert f'Meta field `key` had value `value` not `different value` as expected.' in str(err.value)
+
+    def test_vnd_meta_invalid_key(self, vnd_single):
+        response = self.build_response(vnd_single)
+        with pytest.raises(AssertionError) as err:
+            AssertionHelper.HTTP_200(response, entity_refs=AssertionHelper.EntityRef(
+                resource=EXAMPLE_RESOURCE['type'],
+                meta={
+                    'invalid_key': 'value'
+                },
+             ))
+        assert f'Meta field `invalid_key` not found' in str(err.value)
+
+    def test_vnd_no_meta(self, vnd_single):
+        vnd_single['data'].pop('meta')
+        response = self.build_response(vnd_single)
+        with pytest.raises(AssertionError) as err:
+            AssertionHelper.HTTP_200(response, entity_refs=AssertionHelper.EntityRef(
+                resource=EXAMPLE_RESOURCE['type'],
+                meta={
+                    'key': 'value'
+                },
+             ))
+        assert 'Meta missing' in str(err.value)
+
+    def test_vnd_invalid_meta_format(self, vnd_single):
+        response = self.build_response(vnd_single)
+        with pytest.raises(AssertionError) as err:
+            AssertionHelper.HTTP_200(response, entity_refs=AssertionHelper.EntityRef(
+                resource=EXAMPLE_RESOURCE['type'],
+                meta=[{
+                    'key': 'value'
+                }],
+             ))
+        assert 'Invalid format for meta data <class \'list\'>, must be dict' in str(err.value)
