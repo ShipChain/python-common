@@ -145,6 +145,10 @@ def vnd_list():
                             }
                         ]
                     }
+                },
+                'meta': {
+                    'key': 'value',
+                    'other_key': 'other_value',
                 }
             },
             {
@@ -1138,4 +1142,49 @@ class TestAssertionHelper:
                     'key': 'value'
                 }],
              ))
+        assert 'Invalid format for meta data <class \'list\'>, must be dict' in str(err.value)
+
+    def test_vnd_meta_list(self, vnd_list, entity_ref_1):
+        entity_ref_1.meta = {
+            'key': 'value',
+            'other_key': 'other_value'
+        }
+        response = self.build_response(vnd_list)
+        AssertionHelper.HTTP_200(response, entity_refs=entity_ref_1, is_list=True)
+
+    def test_vnd_list_meta_mismatch(self, vnd_list, entity_ref_1):
+        response = self.build_response(vnd_list)
+        entity_ref_1.meta = {
+            'key': 'different value'
+        }
+        with pytest.raises(AssertionError) as err:
+            AssertionHelper.HTTP_200(response, entity_refs=entity_ref_1, is_list=True)
+        assert f'Meta field `key` had value `value` not `different value` as expected.' in str(err.value)
+
+    def test_vnd_list_meta_invalid_key(self, vnd_list, entity_ref_1):
+        entity_ref_1.meta = {
+            'invalid_key': 'value'
+        }
+        response = self.build_response(vnd_list)
+        with pytest.raises(AssertionError) as err:
+            AssertionHelper.HTTP_200(response, entity_refs=entity_ref_1, is_list=True)
+        assert f'Meta field `invalid_key` not found' in str(err.value)
+
+    def test_vnd_list_no_meta(self, vnd_list, entity_ref_3):
+        entity_ref_3.meta = {
+            'key': 'value',
+            'other_key': 'other_value'
+        }
+        response = self.build_response(vnd_list)
+        with pytest.raises(AssertionError) as err:
+            AssertionHelper.HTTP_200(response, entity_refs=entity_ref_3, is_list=True)
+        assert 'Meta missing' in str(err.value)
+
+    def test_vnd_list_invalid_meta_format(self, vnd_list, entity_ref_1):
+        entity_ref_1.meta = [{
+            'invalid_key': 'value'
+        }]
+        response = self.build_response(vnd_list)
+        with pytest.raises(AssertionError) as err:
+            AssertionHelper.HTTP_200(response, entity_refs=entity_ref_1, is_list=True)
         assert 'Invalid format for meta data <class \'list\'>, must be dict' in str(err.value)

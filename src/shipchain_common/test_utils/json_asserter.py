@@ -101,7 +101,10 @@ def _vnd_assert_entity_ref_in_list(response_list, entity_ref, skip_attributes_pr
                         f'List Attribute key `{attr_key}` missing in {response_single}'
                     assert response_single['attributes'][attr_key] == attr_value, \
                         f'List Attribute Value incorrect `{attr_value}` in {response_single}'
+                if entity_ref.meta:
+                    _vnd_assert_meta(response_single, entity_ref.meta)
                 break
+
         else:
             single_attribute_failed = False
 
@@ -112,6 +115,9 @@ def _vnd_assert_entity_ref_in_list(response_list, entity_ref, skip_attributes_pr
                 elif response_single['attributes'][attr_key] != attr_value:
                     single_attribute_failed = True
                     break
+
+            if entity_ref.meta:
+                _vnd_assert_meta(response_single, entity_ref.meta)
 
             if not single_attribute_failed:
                 found_include = True
