@@ -14,8 +14,8 @@ from django.http.request import HttpRequest
 from rest_framework import exceptions
 from rest_framework_simplejwt.tokens import UntypedToken
 
-from src.shipchain_common.authentication import EngineRequest, passive_credentials_auth, PermissionedTokenUser,\
-    TransmissionRequest
+from src.shipchain_common.authentication import EngineRequest, passive_credentials_auth, PermissionedTokenUser, \
+    TransmissionRequest, LambdaRequest
 from src.shipchain_common.test_utils import get_jwt
 from src.shipchain_common.utils import random_id
 
@@ -41,6 +41,11 @@ def engine_request():
 @pytest.fixture()
 def transmission_request():
     return TransmissionRequest()
+
+
+@pytest.fixture()
+def lambda_request():
+    return LambdaRequest()
 
 
 def test_passive_jwt_auth(username):
@@ -116,6 +121,35 @@ def test_transmission_auth_requires_header(transmission_request):
 
     request.META['X_SSL_CLIENT_DN'] = '/CN=transmission.test-internal'
     assert transmission_request.has_permission(request, {})
+
+
+def test_lambda_auth_requires_header(lambda_request):
+    request = HttpRequest()
+
+    assert not lambda_request.has_permission(request, {})
+
+    request.META['X_NGINX_SOURCE'] = 'alb'
+    assert not lambda_request.has_permission(request, {})
+
+    request.META['X_NGINX_SOURCE'] = 'internal'
+    with pytest.raises(KeyError):
+        lambda_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_VERIFY'] = 'NONE'
+    assert not lambda_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_VERIFY'] = 'SUCCESS'
+    with pytest.raises(KeyError):
+        lambda_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_DN'] = '/CN=lambda.h4ck3d'
+    assert not lambda_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_DN'] = '/CN=profiles.test-internal'
+    assert not lambda_request.has_permission(request, {})
+
+    request.META['X_SSL_CLIENT_DN'] = '/CN=lambda.test-internal'
+    assert lambda_request.has_permission(request, {})
 
 
 def test_token_user_jti_cache_key():
