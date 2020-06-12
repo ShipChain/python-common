@@ -21,11 +21,12 @@ from rest_framework import status
 
 
 class EntityReferenceClass:
-    def __init__(self, resource=None, pk=None, attributes=None, relationships=None):
+    def __init__(self, resource=None, pk=None, attributes=None, relationships=None, meta=None):
         self.resource = resource
         self.pk = pk
         self.attributes = attributes
         self.relationships = relationships
+        self.meta = meta
 
     def __str__(self):
         return f'Type: {self.resource}; ID: {self.pk}; ' \
@@ -100,7 +101,10 @@ def _vnd_assert_entity_ref_in_list(response_list, entity_ref, skip_attributes_pr
                         f'List Attribute key `{attr_key}` missing in {response_single}'
                     assert response_single['attributes'][attr_key] == attr_value, \
                         f'List Attribute Value incorrect `{attr_value}` in {response_single}'
+                if entity_ref.meta:
+                    _vnd_assert_meta(response_single, entity_ref.meta)
                 break
+
         else:
             single_attribute_failed = False
 
@@ -111,6 +115,9 @@ def _vnd_assert_entity_ref_in_list(response_list, entity_ref, skip_attributes_pr
                 elif response_single['attributes'][attr_key] != attr_value:
                     single_attribute_failed = True
                     break
+
+            if entity_ref.meta:
+                _vnd_assert_meta(response_single, entity_ref.meta)
 
             if not single_attribute_failed:
                 found_include = True
@@ -158,6 +165,21 @@ def _vnd_assert_relationships(response_data, relationships):
                             f'EntityRef ID `{relationship_ref.pk}` does not match {response_relationships}'
 
 
+def _vnd_assert_meta(response_data, meta_data):
+    """
+    Scan response data for meta data
+    """
+    assert 'meta' in response_data, f'Meta missing in {response_data}'
+    assert isinstance(meta_data, dict), f'Invalid format for meta data {type(meta_data)}, must be dict'
+
+    response_meta = response_data['meta']
+
+    for key, value in meta_data.items():
+        assert key in response_meta, f'Meta field `{key}` not found in {response_meta}'
+        assert response_meta[key] == value,\
+            f'Meta field `{key}` had value `{response_meta[key]}` not `{value}` as expected.'
+
+
 def _vnd_assert_include(response, included):
     """
     Scan a response for all included resources
@@ -186,6 +208,9 @@ def _vnd_assertions(response_data, entity_ref):
 
     if entity_ref.relationships:
         _vnd_assert_relationships(response_data, entity_ref.relationships)
+
+    if entity_ref.meta:
+        _vnd_assert_meta(response_data, entity_ref.meta)
 
 
 def _plain_assert_attributes_in_response(response, attributes):
