@@ -66,6 +66,10 @@ class TransmissionRequest(InternalRequest):
     SERVICE_NAME = 'transmission'
 
 
+class LambdaRequest(InternalRequest):
+    SERVICE_NAME = 'lambda'
+
+
 class PermissionedTokenUser(TokenUser):
     """
     This Requires the JWT from Profiles to have been generated with the `permissions` scope
