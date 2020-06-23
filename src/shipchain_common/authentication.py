@@ -48,7 +48,7 @@ def is_internal_call(request, service_name=None):
                    and request.META['X_SSL_CLIENT_VERIFY'] == 'SUCCESS')
     if service_name and is_internal:
         certificate_cn = parse_dn(request.META['X_SSL_CLIENT_DN'])['CN']
-        is_internal = is_internal and certificate_cn == f'{service_name}.{settings.ENVIRONMENT.lower()}-internal'
+        is_internal = certificate_cn == f'{service_name}.{settings.ENVIRONMENT.lower()}-internal'
     return is_internal
 
 
