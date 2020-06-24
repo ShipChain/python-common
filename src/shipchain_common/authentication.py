@@ -43,19 +43,20 @@ def get_jwt_from_request(request):
     return None
 
 
-def is_internal_call(request):
-    return ('X_NGINX_SOURCE' in request.META and request.META['X_NGINX_SOURCE'] == 'internal'
-            and request.META['X_SSL_CLIENT_VERIFY'] == 'SUCCESS')
+def is_internal_call(request, service_name=None):
+    is_internal = ('X_NGINX_SOURCE' in request.META and request.META['X_NGINX_SOURCE'] == 'internal'
+                   and request.META['X_SSL_CLIENT_VERIFY'] == 'SUCCESS')
+    if service_name and is_internal:
+        certificate_cn = parse_dn(request.META['X_SSL_CLIENT_DN'])['CN']
+        is_internal = certificate_cn == f'{service_name}.{settings.ENVIRONMENT.lower()}-internal'
+    return is_internal
 
 
 class InternalRequest(BasePermission):
     def has_permission(self, request, view):
         if settings.ENVIRONMENT in ('LOCAL', 'INT'):
             return True
-        if is_internal_call(request):
-            certificate_cn = parse_dn(request.META['X_SSL_CLIENT_DN'])['CN']
-            return certificate_cn == f'{self.SERVICE_NAME}.{settings.ENVIRONMENT.lower()}-internal'
-        return False
+        return is_internal_call(request, self.SERVICE_NAME)
 
 
 class EngineRequest(InternalRequest):
