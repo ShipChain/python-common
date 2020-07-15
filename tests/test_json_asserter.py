@@ -1,4 +1,5 @@
 from unittest.mock import Mock
+import uuid
 
 import pytest
 from rest_framework import status
@@ -734,6 +735,13 @@ class TestAssertionHelper:
         with pytest.raises(AssertionError) as err:
             AssertionHelper.HTTP_200(response, entity_refs=[AssertionHelper.EntityRef()])
         assert 'entity_refs should not be a list for a non-list response' in str(err.value)
+
+    def test_vnd_entity_uuid_pk(self, vnd_single):
+        response = self.build_response(vnd_single)
+        AssertionHelper.HTTP_200(response, entity_refs=AssertionHelper.EntityRef(
+            resource=EXAMPLE_RESOURCE['type'],
+            pk=uuid.UUID(EXAMPLE_RESOURCE['id'])
+        ))
 
     def test_vnd_entity_full_match(self, vnd_single):
         response = self.build_response(vnd_single)

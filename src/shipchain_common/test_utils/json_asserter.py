@@ -201,7 +201,8 @@ def _vnd_assertions(response_data, entity_ref):
         assert response_data['type'] == entity_ref.resource, f'Invalid Resource Type in {response_data}'
 
     if entity_ref.pk:
-        assert response_data['id'] == entity_ref.pk, f'Invalid ID in {response_data}'
+        # entity_ref.pk can be a CharField or a UUIDField. Force string comparison for ease of use with UUIDField.
+        assert response_data['id'] == str(entity_ref.pk), f'Invalid ID in {response_data}'
 
     if entity_ref.attributes:
         _vnd_assert_attributes(response_data, entity_ref.attributes)
