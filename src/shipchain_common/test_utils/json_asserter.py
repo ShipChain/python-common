@@ -28,6 +28,10 @@ class EntityReferenceClass:
         self.relationships = relationships
         self.meta = meta
 
+        if self.pk is not None:
+            # entity_ref.pk can be a CharField or a UUIDField. Force to string for easier comparisons.
+            self.pk = str(self.pk)
+
     def __str__(self):
         return f'Type: {self.resource}; ID: {self.pk}; ' \
                f'attributes: {self.attributes}; relationships: {self.relationships}'
@@ -201,8 +205,7 @@ def _vnd_assertions(response_data, entity_ref):
         assert response_data['type'] == entity_ref.resource, f'Invalid Resource Type in {response_data}'
 
     if entity_ref.pk:
-        # entity_ref.pk can be a CharField or a UUIDField. Force string comparison for ease of use with UUIDField.
-        assert response_data['id'] == str(entity_ref.pk), f'Invalid ID in {response_data}'
+        assert response_data['id'] == entity_ref.pk, f'Invalid ID in {response_data}'
 
     if entity_ref.attributes:
         _vnd_assert_attributes(response_data, entity_ref.attributes)
