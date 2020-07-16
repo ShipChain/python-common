@@ -1,9 +1,8 @@
-from unittest.mock import Mock
-import uuid
-
 import pytest
+import uuid
 from rest_framework import status
 from shipchain_common.test_utils import AssertionHelper
+from unittest.mock import Mock
 
 EXAMPLE_PLAIN = {
     'id': '07b374c3-ed9b-4811-901a-d0c5d746f16a',
@@ -738,10 +737,21 @@ class TestAssertionHelper:
 
     def test_vnd_entity_uuid_pk(self, vnd_single):
         response = self.build_response(vnd_single)
-        AssertionHelper.HTTP_200(response, entity_refs=AssertionHelper.EntityRef(
-            resource=EXAMPLE_RESOURCE['type'],
-            pk=uuid.UUID(EXAMPLE_RESOURCE['id'])
-        ))
+        AssertionHelper.HTTP_200(
+            response,
+            entity_refs=AssertionHelper.EntityRef(
+                resource=EXAMPLE_RESOURCE['type'],
+                pk=uuid.UUID(EXAMPLE_RESOURCE['id']),
+                attributes=EXAMPLE_RESOURCE['attributes'],
+                relationships={'owner': AssertionHelper.EntityRef(
+                    resource=EXAMPLE_USER['type'],
+                    pk=uuid.UUID(EXAMPLE_USER['id']),
+                )}
+            ),
+            included=AssertionHelper.EntityRef(
+                resource=EXAMPLE_RESOURCE_2['type'],
+                pk=uuid.UUID(EXAMPLE_RESOURCE_2['id']),
+            ))
 
     def test_vnd_entity_full_match(self, vnd_single):
         response = self.build_response(vnd_single)
