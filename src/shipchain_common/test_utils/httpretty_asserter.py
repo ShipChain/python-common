@@ -79,6 +79,8 @@ class HTTPrettyAsserter(ResponsesHTTPretty):
         for index, _ in enumerate(calls_list):
             self._assert_call_in_list(calls_list[index], asserted_calls[index])
 
+        self.reset_calls()
+
     def _assert_call_in_list(self, call, assertion):
         assert 'path' in assertion, 'Error: Must include path in assertion.'
         assert assertion["path"] == call['path'], \
