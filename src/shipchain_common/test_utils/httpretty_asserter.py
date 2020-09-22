@@ -54,7 +54,7 @@ class ResponsesAsserter(ResponsesHTTPrettyWrapper):
     def _parse_calls_into_list(self):
         calls_list = []
         assert self.latest_requests, 'Error: No calls made to be parsed.'
-        for _, call in enumerate(self.latest_requests):
+        for call in self.latest_requests:
             url = urlparse(call.request.url)
             body = call.request.body or ''
             if call.request.headers.get('content-type', '') in ('application/json', 'text/json'):
