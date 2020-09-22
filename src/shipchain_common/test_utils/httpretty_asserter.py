@@ -47,6 +47,8 @@ class ResponsesHTTPretty:
     def latest_requests(self):
         return self.mock.calls
 
+    def reset(self):
+        self.mock._calls.reset()  # pylint:disable=protected-access
 
 
 class HTTPrettyAsserter(ResponsesHTTPretty):
