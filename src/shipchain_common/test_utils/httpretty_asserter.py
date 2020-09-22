@@ -51,10 +51,11 @@ class HTTPrettyAsserter(ResponsesHTTPretty):
         assert self.latest_requests, 'Error: No calls made to be parsed.'
         for _, call in enumerate(self.latest_requests):
             url = urlparse(call.request.url)
+            body = call.request.body or ''
             if call.request.headers.get('content-type', '') in ('application/json', 'text/json'):
-                body = parse_value(call.request.body)
+                body = parse_value(body)
             else:
-                body = parse_urlencoded_data(call.request.body)
+                body = parse_urlencoded_data(body)
 
             calls_list.append({
                 'path': url.path,
@@ -62,7 +63,6 @@ class HTTPrettyAsserter(ResponsesHTTPretty):
                 'body': body,
                 'host': url.hostname
             })
-            # self.latest_requests[index] = None
         assert calls_list, 'Error: No calls made to be parsed.'
         return calls_list
 
@@ -99,4 +99,8 @@ def modified_http_pretty():
     http_pretty_asserter = HTTPrettyAsserter()
     yield http_pretty_asserter
     http_pretty_asserter.reset_calls()
-    responses.stop()
+    try:
+        responses.stop()
+    except RuntimeError:
+        # Ignore unittest.mock "stop called on unstarted patcher" exception
+        pass
