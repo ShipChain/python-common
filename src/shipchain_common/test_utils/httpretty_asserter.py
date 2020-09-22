@@ -36,8 +36,12 @@ class ResponsesHTTPretty:
                      match_querystring=False,
                      **headers
                      ):
-        self.mock.add(method=method, url=uri, body=body, status=status,
-                      adding_headers=adding_headers, match_querystring=match_querystring, headers=headers)
+        try:
+            self.mock.replace(method_or_response=method, url=uri, body=body, status=status,
+                              match_querystring=match_querystring, headers=headers)
+        except ValueError:
+            self.mock.add(method=method, url=uri, body=body, status=status,
+                          adding_headers=adding_headers, match_querystring=match_querystring, headers=headers)
 
     @property
     def latest_requests(self):
