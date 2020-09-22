@@ -20,7 +20,7 @@ from urllib.parse import urlparse
 from ..utils import parse_urlencoded_data, parse_value
 
 
-class ResponsesHTTPretty:
+class ResponsesHTTPrettyWrapper:
     def __init__(self):
         self.mock = responses.mock
 
@@ -50,8 +50,7 @@ class ResponsesHTTPretty:
     def reset(self):
         self.mock._calls.reset()  # pylint:disable=protected-access
 
-
-class HTTPrettyAsserter(ResponsesHTTPretty):
+class ResponsesAsserter(ResponsesHTTPrettyWrapper):
     def _parse_calls_into_list(self):
         calls_list = []
         assert self.latest_requests, 'Error: No calls made to be parsed.'
@@ -102,13 +101,18 @@ class HTTPrettyAsserter(ResponsesHTTPretty):
 
 
 @pytest.yield_fixture(scope='function')
-def modified_http_pretty():
+def modified_responses():
     responses.start()
-    http_pretty_asserter = HTTPrettyAsserter()
-    yield http_pretty_asserter
-    http_pretty_asserter.reset_calls()
+    responses_asserter = ResponsesAsserter()
+    yield responses_asserter
+    responses_asserter.reset_calls()
     try:
         responses.stop()
     except RuntimeError:
         # Ignore unittest.mock "stop called on unstarted patcher" exception
         pass
+
+
+# Deprecated names for backwards-compatibility
+HTTPrettyAsserter = ResponsesAsserter
+modified_http_pretty = modified_responses
