@@ -43,33 +43,50 @@ class ResponsesHTTPrettyWrapper:
             self.mock.add(method=method, url=uri, body=body, status=status,
                           adding_headers=adding_headers, match_querystring=match_querystring, headers=headers)
 
+    class Call:
+        def __init__(self, responses_call):
+            self.call = responses_call
+            self.url = urlparse(self.call.request.url)
+
+        def __getattr__(self, item):
+            return getattr(self.call, item)
+
+        @property
+        def parsed_body(self):
+            body = self.call.request.body or ''
+            if self.call.request.headers.get('content-type', '') in ('application/json', 'text/json'):
+                body = parse_value(body)
+            else:
+                body = parse_urlencoded_data(body)
+
+            return body
+
+        @property
+        def querystring(self):
+            return parse_urlencoded_data(self.url.query)
+
+
     @property
     def latest_requests(self):
-        return self.mock.calls
+        return [self.Call(call) for call in self.mock.calls]
 
     def last_request(self):
-        return self.mock.calls[-1] if self.mock.calls else None
+        return self.Call(self.mock.calls[-1]) if self.mock.calls else None
 
     def reset(self):
         self.mock._calls.reset()  # pylint:disable=protected-access
+
 
 class ResponsesAsserter(ResponsesHTTPrettyWrapper):
     def _parse_calls_into_list(self):
         calls_list = []
         assert self.latest_requests, 'Error: No calls made to be parsed.'
         for call in self.latest_requests:
-            url = urlparse(call.request.url)
-            body = call.request.body or ''
-            if call.request.headers.get('content-type', '') in ('application/json', 'text/json'):
-                body = parse_value(body)
-            else:
-                body = parse_urlencoded_data(body)
-
             calls_list.append({
-                'path': url.path,
-                'query': parse_urlencoded_data(url.query),
-                'body': body,
-                'host': url.hostname
+                'path': call.url.path,
+                'query': call.querystring,
+                'body': call.parsed_body,
+                'host': call.url.hostname
             })
         assert calls_list, 'Error: No calls made to be parsed.'
         return calls_list
