@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shipchain-common"
-version = "1.0.28"
+version = "1.0.29"
 description = "A PyPI package containing shared code for ShipChain's Python/Django projects."
 
 license = "Apache-2.0"
@@ -37,10 +37,10 @@ requests = "^2.21"
 bandit = "^1.5"
 coverage = "~4.5.1"
 djangorestframework-simplejwt = {git = "git://github.com/davesque/django-rest-framework-simplejwt.git", rev = "04a4f7f2e045ac4a49542b7e98350e66431adcf5"}
-httpretty = "~=0.9"
 prospector = "~1.1.6.2"
 pytest = "^3.0"
 pytest-cov = "^2.6"
 pytest-django = "^3.6"
 pytest-mock = "^1.10"
+responses = "~0.12"
 safety = "^1.8"

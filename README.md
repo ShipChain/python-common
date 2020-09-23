@@ -192,28 +192,21 @@ This will automatically add the `json_asserter` and set it as a class attribute 
 This allows you to just call `self.json_asserter`, allowing for cleaner unit tests imports. 
 
 
-### HTTPrettyAsserter Usage
+### ResponsesAsserter Usage
 
 When mocking calls, this can help in ensuring all calls, and only those, were made as expected, with the desired parameters.
-In order to use, simply import the HTTPrettyAsserter from test_utils and use it in place of the usual httpretty:
-```python
-@pytest.yield_fixture
-def modified_http_pretty():
-    HTTPrettyAsserter.enable(allow_net_connect=False)
-    yield HTTPrettyAsserter
-    HTTPrettyAsserter.disable()
-```
+In order to use, simply import the `modified_responses` fixture from test_utils.
 
-Then, you just need to register the uris for the calls you want to mock, and ensure that it is returned in the mocking:
+Then, you just need to register the uris for the calls you want to mock:
 ```python
 @pytest.fixture
-def http_pretty_list_mocking(modified_http_pretty):
-    modified_http_pretty.register_uri(modified_http_pretty.POST, 'http://google.com/path', status=status.HTTP_200_OK)
-    modified_http_pretty.register_uri(modified_http_pretty.POST, 'http://google.com/other_path',
+def responses_list_mocking(modified_responses):
+    modified_responses.register_uri(modified_responses.POST, 'http://google.com/path', status=status.HTTP_200_OK)
+    modified_responses.register_uri(modified_responses.POST, 'http://google.com/other_path',
                                       status=status.HTTP_200_OK)
-    modified_http_pretty.register_uri(modified_http_pretty.POST, 'http://bing.com/bing_path',
+    modified_responses.register_uri(modified_responses.POST, 'http://bing.com/bing_path',
                                       status=status.HTTP_200_OK)
-    return modified_http_pretty
+    return modified_responses
 ```
 
 In a test that you want to check the calls on, you simply need to use the mocking fixture and call `.assert_calls(assertions)` on the fixture.
