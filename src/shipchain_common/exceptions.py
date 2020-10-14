@@ -214,3 +214,9 @@ class URLShortenerError(Custom500Error):
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     default_detail = 'URL Shortener Error.'
     default_code = 'server_error'
+
+
+class AccountLimitReached(APIException):
+    status_code = status.HTTP_402_PAYMENT_REQUIRED
+    default_detail = 'Request denied due to the restrictions of your current billing tier.'
+    default_code = 'account_limit_reached'
