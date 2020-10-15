@@ -416,6 +416,10 @@ def assert_401(response, error='Authentication credentials were not provided', v
     assert response.status_code == status.HTTP_401_UNAUTHORIZED, f'status_code {response.status_code} != 401'
     response_has_error(response, error, vnd=vnd)
 
+def assert_402(response, error='Request denied due to the restrictions of your current billing tier.', vnd=True):
+    assert response is not None
+    assert response.status_code == status.HTTP_402_PAYMENT_REQUIRED, f'status_code {response.status_code} != 402'
+    response_has_error(response, error, vnd=vnd)
 
 def assert_403(response, error='You do not have permission to perform this action', vnd=True):
     assert response is not None
@@ -459,6 +463,7 @@ class AssertionHelper:
 
     HTTP_400 = assert_400
     HTTP_401 = assert_401
+    HTTP_402 = assert_402
     HTTP_403 = assert_403
     HTTP_404 = assert_404
     HTTP_405 = assert_405
