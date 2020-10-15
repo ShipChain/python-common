@@ -152,54 +152,6 @@ def test_lambda_auth_requires_header(lambda_request):
     assert lambda_request.has_permission(request, {})
 
 
-def test_token_user_jti_cache_key():
-    """By default, the jti is included in get_jwt and is used as cache key"""
-    jwt = get_jwt()
-    token = UntypedToken(jwt)
-    token_user = PermissionedTokenUser(token)
-    assert token_user._get_permission_cache_key() == token_user.token.get('jti')
-
-
-def test_token_user_at_hash_cache_key():
-    """If no jti is included in get_jwt then use at_hash as cache key if exists"""
-    jwt = get_jwt(jti=0, at_hash=uuid4().hex)
-    token = UntypedToken(jwt)
-    token_user = PermissionedTokenUser(token)
-    assert token_user._get_permission_cache_key() == token_user.token.get('at_hash')
-
-
-def test_token_user_sub_exp_cache_key():
-    """If no jti or at_hash is included in get_jwt then use {sub}.{exp} as cache key"""
-    jwt = get_jwt(jti=0, sub=uuid4().hex)
-    token = UntypedToken(jwt)
-    token_user = PermissionedTokenUser(token)
-    assert token_user._get_permission_cache_key() == f'{token_user.token.get("sub")}.{token_user.token.get("exp")}'
-
-
-def test_token_user_cache_life():
-    jwt = get_jwt()
-    token = UntypedToken(jwt)
-    token_user = PermissionedTokenUser(token)
-    assert token_user._get_permission_cache_life() == 300
-
-
-def test_token_user_cache_calculated_life():
-    iat = datetime_to_epoch(aware_utcnow())
-    jwt = get_jwt(exp=iat+15, iat=iat)
-    token = UntypedToken(jwt)
-    token_user = PermissionedTokenUser(token)
-    assert token_user._get_permission_cache_life() == 15
-
-
-def test_token_user_cache_fallback_life():
-    iat = datetime_to_epoch(aware_utcnow())
-    jwt = get_jwt(exp=iat+15, iat=iat)
-    token = UntypedToken(jwt)
-    token.payload['iat'] = None
-    token_user = PermissionedTokenUser(token)
-    assert token_user._get_permission_cache_life() == 300
-
-
 @pytest.fixture
 def one_feature():
     """Returns feature object response in token, and list of feature permissions"""

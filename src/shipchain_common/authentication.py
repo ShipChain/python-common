@@ -13,13 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
+from datetime import timedelta
 from django.conf import settings
-from django.core.cache import cache
+from django.utils.functional import cached_property
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import BasePermission
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.models import TokenUser
+from rest_framework_simplejwt.utils import aware_utcnow
 
 from .utils import parse_dn
 
@@ -89,43 +91,18 @@ class PermissionedTokenUser(TokenUser):
     def check_password(self, raw_password):
         raise NotImplementedError('Token users have no DB representation')
 
-    def _get_permission_cache_key(self):
-        """
-        Build a unique cache key for this specific JWT.
-        If no `jti`, `at_hash`, or `sub` and `exp`, then return None
-        """
-        unique_key = self.token.get('jti')
+    @cached_property
+    def _permissions(self):
+        features = self.token.get('features')
+        if not features:
+            return []
 
-        if not unique_key:
-            unique_key = self.token.get('at_hash')
+        permissions = []
+        for feature in features:
+            for permission in features[feature]:
+                permissions.append(f'{feature}.{permission}')
 
-        if not unique_key:
-            sub = self.token.get("sub")
-            exp = self.token.get("exp")
-            if sub and exp:
-                unique_key = f'{sub}.{exp}'
-
-        return unique_key
-
-    def _get_permission_cache_life(self):
-        """
-        Determine cache life from JWT.  If exp or iat are not present, or
-        if calculation results in an invalid life, return the fallback_life
-        """
-        fallback_life = 300
-
-        exp = self.token.get("exp")
-        iat = self.token.get("iat")
-
-        if not exp or not iat:
-            return fallback_life
-
-        life = exp - iat
-
-        if not life or life <= 0:
-            return fallback_life
-
-        return life
+        return permissions
 
     def get_all_permissions(self, obj=None):
         """
@@ -134,26 +111,16 @@ class PermissionedTokenUser(TokenUser):
         This prevents re-parsing the permissions over the lifetime of this token
         as they will not change until a new token is received
         """
-        permissions = None
-        unique_key = self._get_permission_cache_key()
+        try:
+            # Check token expiration, invalidate cache if expired
+            self.token.check_exp(current_time=aware_utcnow() + timedelta(seconds=30))
+        except TokenError:
+            try:
+                del self._permissions
+            except AttributeError:
+                pass
 
-        if unique_key:
-            permissions = cache.get(unique_key)
-
-        if not permissions:
-            features = self.token.get('features')
-            if not features:
-                return []
-
-            permissions = []
-            for feature in features:
-                for permission in features[feature]:
-                    permissions.append(f'{feature}.{permission}')
-
-            if unique_key:
-                cache.set(unique_key, permissions, self._get_permission_cache_life())
-
-        return permissions
+        return self._permissions
 
     def has_perm(self, perm, obj=None):
         """
@@ -166,3 +133,14 @@ class PermissionedTokenUser(TokenUser):
         Validate perm_list is in token feature permissions
         """
         return all(self.has_perm(perm, obj) for perm in perm_list)
+
+    @property
+    def limits(self):
+        return self.token.get('limits', {})
+
+    def get_limit(self, entity, name):
+        limit = None
+        entity = self.limits.get(entity)
+        if entity:
+            limit = entity.get(name)
+        return limit
