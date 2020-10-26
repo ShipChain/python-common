@@ -232,7 +232,9 @@ class ConfigurableGenericViewSet(GenericViewSet):
         """
         serialization_type = kwargs.pop('serialization_type', mixins.SerializationType.REQUEST)
         serializer_class = self.get_serializer_class(serialization_type)
-        kwargs['context'] = self.get_serializer_context()
+        if 'context' not in kwargs:
+            kwargs['context'] = {}
+        kwargs['context'].update(self.get_serializer_context())
         return serializer_class(*args, **kwargs)
 
     # pylint: disable=arguments-differ

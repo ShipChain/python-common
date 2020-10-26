@@ -10,6 +10,8 @@ except Exception as exc:
 
 from shipchain_common.mixins import SerializationType, MultiSerializerViewSetMixin, MultiPermissionViewSetMixin
 from shipchain_common.viewsets import ActionConfiguration, ConfigurableGenericViewSet
+from rest_framework_json_api import serializers
+from tests.django_mocking.models import EnumObject
 
 
 class FakePermission:
@@ -53,6 +55,12 @@ class CustomActionSerializer(DefaultSerializer):
 
 class CustomActionCSVSerializer(DefaultSerializer):
     pass
+
+
+class ModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnumObject
+        fields = '__all__'
 
 
 class TestActionConfiguration:
@@ -468,6 +476,18 @@ class TestConfigurableGenericViewSet:
         assert viewset.get_permissions() == [FakePermission2]
         assert 'update' not in viewset.configuration
         assert 'update' not in viewset.action_user_permissions
+
+    def test_custom_context(self, viewset):
+        viewset.default_required_user_permissions = ['feature.default_permission']
+        viewset.configuration = {
+            'create': ActionConfiguration(
+                request_serializer=ModelSerializer
+            ),
+        }
+
+        viewset.action = 'create'
+        serializer = viewset.get_serializer(context={'custom key': 'custom value'})
+        assert serializer.context['custom key'] == 'custom value'
 
     def test_configurable_generic_view_set_default_user_perms(self, viewset):
         viewset.default_required_user_permissions = ['feature.default_permission']
